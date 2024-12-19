@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "employee-ecp"
+version = "0.1.0"
+description = "Программа для работы с данными по ЭКЦ"
+authors = ["mi42195 <aptraev.mv@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+flet = "^0.25.0"
+pydantic = "^2.10.2"
+flet-route = "^0.3.3"
+sqlmodel = "^0.0.22"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
