@@ -1,3 +1,4 @@
+
 import flet as ft
 from datetime import datetime
 
@@ -7,18 +8,18 @@ from model import Employee, ECP, KriptoPro, add_instance  # Ваши модел�
 from utils.style import *
 
 
-class UpdateEmployeesPage:
+class AddKriptoproPage :
     def __init__(self, page: ft.Page):
         self.page = page  # основная страница приложения
 
 
     # Элементы интерфейса
-    text_add = ft.Text("Добавление сотрудника", color=defaultFontColor,
+    text_add = ft.Text("Добавление криптопро к сотруднику", color=defaultFontColor,
                        weight=ft.FontWeight.NORMAL,
                        text_align=ft.TextAlign.LEFT
                        )
 
-    # Поля ввода для "Сотрудника"
+    # Поля ввода для "ECP"
     employee_full_name_input = ft.Container(
         content=ft.TextField(
             label="Введите ФИО сотрудника",
@@ -66,7 +67,7 @@ class UpdateEmployeesPage:
         page.window.min_height = 600
 
         return ft.View(
-            "/update_employees",
+            "/add",
             controls=[
                 ft.Row(
                     expand=True,

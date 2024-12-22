@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query, Body
 from sqlalchemy import select, insert, update, delete
 
+from crud.dependensis import PaginationParams, PaginationDep
 from models.ecpes import EcpORM
 from database import async_session_maker, engine
 from schemas.ecpies import EcpAdd, EcpReqestAdd, EcpPatch, EcpPut
@@ -9,19 +10,19 @@ from models.kriptoproies import KriptosORM
 
 
 def get_all_ecp(
-    employees_id: int,
-    kriptopro_id: int,
-
+    page = 1,
+    per_page = 10
 ):
     async with async_session_maker() as session:
-        query = select(KriptosORM).filter_by(id=kriptopro_id, employees_id=employees_id)
+        query = select(EcpORM).limit(per_page).offset(per_page * (page - 1))
         print(query.compile(compile_kwargs={"literal_binds": True}))
         result = session.execute(query)
-        kript = result.scalars().all()
-        return {"status": "ok", "kript": kript}
+        emloyees = result.scalars().all()
+        print(emloyees)
+        return emloyees
 
 
-def get_all_ecp(
+def get_one_ecp(
     install_location:str,
     storage_location
 ):
@@ -49,7 +50,7 @@ def get_one_ecp(ecp_id: int):
 
 
 
-async def create_ecp(
+def create_ecp(
     employees_id: int,
     ecp_data: EcpReqestAdd):
 
@@ -60,7 +61,7 @@ async def create_ecp(
         result =  session.execute(ecp_data_stmt)
         ecp = result.scalars().one()
         session.commit()
-        return {"status": "ok", "ecp": ecp}
+        return ecp
 
 
 

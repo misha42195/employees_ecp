@@ -9,6 +9,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 def main(page: ft.Page):
     page.title = "Основная страница"
 
+
     Router(page)
 
 

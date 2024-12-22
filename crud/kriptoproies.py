@@ -50,7 +50,7 @@ def full_update_kriptopro(
         return {"status": "ok"}
 
 
-def update_ecp(
+def update_kriptopro(
     employees_id: int,
     kriptopro_id: int,
     kriptopro_data: KriptoproAddRequest = Body()
@@ -69,7 +69,7 @@ def update_ecp(
         return {"status": "ok"}
 
 
-def delete_ecp(
+def delete_kriptopro(
     employees_id: int,
     kriptopro_id: int
 ):

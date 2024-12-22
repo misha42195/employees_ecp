@@ -12,8 +12,9 @@ class DashboardPage:
         page.title = "Панель управления"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
-        page.window.min_width = 900
-        page.window.min_height = 400
+        page.window.min_width = 1000
+        page.window.min_height = 600
+        page.scroll = "adaptive"
 
         def input_form(label):
             return ft.TextField(
@@ -32,19 +33,26 @@ class DashboardPage:
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
-            padding=ft.padding.symmetric(0,13),
+            padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor,size=12),
-                    ft.TextButton("Главная страница",icon=ft.Icons.HOME,style=style_menu,),
-                    ft.TextButton("Добавить нового сотрудника",icon=ft.Icons.ADD,style=style_menu,on_click=lambda e:self.page.go("/add")),
-                    ft.TextButton("Добавить ЕЦП",icon=ft.Icons.UPDATE,style=style_menu,on_click=lambda e:self.page.go("/ecp_add")),
-                    ft.TextButton("Добавить Крипто ПРО",icon=ft.Icons.UPDATE,style=style_menu,on_click=lambda e:self.page.go("/crypto_add")),
-                    ft.TextButton("Удалить сотрудника на хуй",icon=ft.Icons.DELETE,style=style_menu,on_click=lambda e:self.page.go("/delete")),
-                    #todo 8 видео
+                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
+                    ft.TextButton("Список сотрудников", icon=ft.Icons.WORK, style=style_menu,
+                                  on_click=lambda e: self.page.go("/")),
+                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                                  on_click=lambda e: self.page.go("/add_employees")),
+                    ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+                                  on_click=lambda e: self.page.go("/add_ecp")),
+                    ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+                                  on_click=lambda e: self.page.go("/add_crypto")),
+                    ft.TextButton("Обновить данные сотрудника", icon=ft.Icons.UPDATE, style=style_menu,
+                                  on_click=lambda e: self.page.go("/update_employees")),
+                    ft.TextButton("Удалить сотрудника на хуй", icon=ft.Icons.DELETE, style=style_menu,
+                                  on_click=lambda e: self.page.go("/delete_employees")),
+                     ft.TextButton("Панель управления", icon=ft.Icons.DELETE, style=style_menu,
+                                  on_click=lambda e: self.page.go("/dashboard")),
                 ]
             )
-
 
         )
 

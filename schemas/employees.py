@@ -11,7 +11,7 @@ class Employee(EmployeeAdd):
     id: int
 
 # схема для полного изменения данных сотрудника
-class EmployeePut(BaseModel):
+class EmployeePost(BaseModel):
     full_name: str
     position: str
     com_name: str

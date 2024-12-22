@@ -7,6 +7,6 @@ secondaryFontColor = '#5fa8ff'
 inputBgColor = '#1d2b4f'
 hoverBgColor = '#338aff'
 # Настройки окна
-defaultWithWindow = '1000'
-defaultHeightWindow = '600'
+defaultWithWindow = '1500'
+defaultHeightWindow = '1000'
 menuFontColor = '#949596'
