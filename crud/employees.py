@@ -1,7 +1,8 @@
 from oauthlib.uri_validate import query
 from pydantic import BaseModel
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, func
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload
 
 from schemas.employees import Employee, EmployeeAdd, EmployeePost
 
@@ -10,48 +11,40 @@ from crud.dependensis import PaginationDep
 from database import session_maker, engine
 from repositories.employees import EmployeesRepository
 from exetions.exeption_ import EmployeeNotFoundException
-from models.employess import  EmployeesORM
+from models.employess import EmployeesORM
 
-
-
-# def get_all_employess(
-#     page = 1,
-#     per_page = 10
-# ):
-#     with session_maker() as session:
-#         query = select(EmployeesORM).limit(per_page).offset(per_page * (page - 1))
-#         print(query.compile(compile_kwargs={"literal_binds": True}))
-#         result = session.execute(query)
-#         result = result.scalars().all()
-#         print(f"result: ",result)
-#         emloyees = [Employee.model_validate(model, from_attributes=True) for model in result]
-#         print(f"employees: {emloyees}")
-#         return emloyees
-
-def get_one_with_employees_full_name(full_name=None):
-        with session_maker() as session:
-            if not full_name:
-                raise EmployeeNotFoundException(full_name=full_name)
-            query = select(EmployeesORM.full_name.ilike(f"%{full_name}%"))
-            result= session.execute(query).scalars().one_or_none()
-            print(result)
-            if result is None:
-                raise EmployeeNotFoundException(f"Сотрудник с именем {full_name} не найден")
-            print(f"result: ",result)
-            empl =  Employee.model_validate(result, from_attributes=True)
-            print(f"empl: ",empl)
-            return empl
 
 
 
-def delete_employee(
-    employee_id: int,
-):
+def get_one_with_employees_full_name(full_name=None):
     with session_maker() as session:
-        EmployeesRepository(session).delete(id=employee_id)
-        session.commit()
+        # query = select(EmployeesORM).where(EmployeesORM.full_name.ilike(f"%{full_name.lower()}%"))
+        query = select(EmployeesORM).where(func.lower(EmployeesORM.full_name).like(f"%{full_name}%"))
+        print(query.compile(compile_kwargs={"literal_binds": True}))
+        result = session.execute(query)
+        model = result.scalars().first()
+        print(model)
+        return model
 
-# Добавление сотрудника
+    # Добавление сотрудника
+def get_ecp_kriptopro_employee_name(full_name=None):
+    with session_maker() as session:
+        query = (select(EmployeesORM).
+                 options(joinedload(EmployeesORM.ecp),
+                        joinedload(EmployeesORM.kriptos)
+                        ).where(
+            func.lower(EmployeesORM.full_name).like(f"%{full_name}%")))
+        print(query.compile(compile_kwargs={"literal_binds": True}))
+
+        result = session.execute(query)
+        model = result.scalars().first()
+        if model is None:
+            raise ValueError(f"Сотрудник с ФИО '{full_name}' не найден.")
+        print(model)
+        return model
+
+    # Добавление сотрудника
+
 def add_employee(employee_data: EmployeePost):
     with session_maker() as session:
         _employee_data = EmployeePost(**employee_data.model_dump())
@@ -75,8 +68,12 @@ def add_employee(employee_data: EmployeePost):
             raise ValueError(f"Ошибка при добавлении сотрудника: {str(e)}")
 
 
-
-
+def delete_employee(
+    employee_id: int,
+):
+    with session_maker() as session:
+        EmployeesRepository(session).delete(id=employee_id)
+        session.commit()
 
 
 def full_update_employee(

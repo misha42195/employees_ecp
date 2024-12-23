@@ -1,39 +1,39 @@
-import flet as ft
-from utils.style import *
-
-
-class EmployeesForm:
-    def __init__(self, page, on_success):
-        self.page = page
-        # self.on_success = on_success
-
-        # фио сотрудника
-        self.full_name_input = ft.Container(
-            content=ft.TextField(label="Введите ФИО сотрудника",
-                                 bgcolor=secondaryBgColor,
-                                 border=ft.InputBorder.NONE,
-                                 filled=True,
-                                 color=secondaryFontColor),
-            border_radius=15
-        )
-        # должность
-        self.position_input = ft.Container(
-            content=ft.TextField(label="Введите должность сотрудника",
-                                 bgcolor=secondaryBgColor,
-                                 border=ft.InputBorder.NONE,
-                                 filled=True,
-                                 color=secondaryFontColor),
-            border_radius=15
-        )
-        # имя компьютера
-        self.comp_name_input = ft.Container(
-            content=ft.TextField(
-                label="Введите имя компьютера",
-                bgcolor=secondaryBgColor,
-                border=ft.InputBorder.NONE,
-                filled=True,
-                color=secondaryFontColor),
-            border_radius=15)
+# import flet as ft
+# from utils.style import *
+#
+#
+# class EmployeesForm:
+#     def __init__(self, page, on_success):
+#         self.page = page
+#         # self.on_success = on_success
+#
+#         # фио сотрудника
+#         self.full_name_input = ft.Container(
+#             content=ft.TextField(label="Введите ФИО сотрудника",
+#                                  bgcolor=secondaryBgColor,
+#                                  border=ft.InputBorder.NONE,
+#                                  filled=True,
+#                                  color=secondaryFontColor),
+#             border_radius=15
+#         )
+#         # должность
+#         self.position_input = ft.Container(
+#             content=ft.TextField(label="Введите должность сотрудника",
+#                                  bgcolor=secondaryBgColor,
+#                                  border=ft.InputBorder.NONE,
+#                                  filled=True,
+#                                  color=secondaryFontColor),
+#             border_radius=15
+#         )
+#         # имя компьютера
+#         self.comp_name_input = ft.Container(
+#             content=ft.TextField(
+#                 label="Введите имя компьютера",
+#                 bgcolor=secondaryBgColor,
+#                 border=ft.InputBorder.NONE,
+#                 filled=True,
+#                 color=secondaryFontColor),
+#             border_radius=15)
     #
     #     # # тип контейнера(токен/реестр) выпадающий список
     #     self.type_ecp_or_token_input = ft.Container(

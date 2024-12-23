@@ -3,7 +3,7 @@ from datetime import date
 from pydantic import BaseModel
 
 
-class KriptoproAddRequest(BaseModel):
+class KriptoproRequestAdd(BaseModel):
     install_location: str
     licens_type: str
     start_date: date

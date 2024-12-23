@@ -160,20 +160,25 @@
 #         )
 #
 #
-
+from datetime import datetime
 
 import flet as ft
 from flet_route import Params, Basket
 from utils import *
 from utils.style import *
 from repositories.employees import EmployeesRepository
-from crud.employees import get_one_with_employees_full_name, add_employee
+from crud.employees import get_one_with_employees_full_name, add_employee, get_ecp_kriptopro_employee_name
 from model import Employee
 
 
 class EmployeesPage:
     def __init__(self, page: ft.Page):
         self.page = page  # основная страница приложения
+        self.employee_info = ft.ListView(
+            controls=[],
+            expand=True,
+            auto_scroll=True
+        )
 
         # Элементы интерфейса
         self.result_text = ft.Text("", color=ft.Colors.BLACK)
@@ -209,6 +214,10 @@ class EmployeesPage:
 
     def submit_form(self, e):
         full_name = self.employee_full_name_input.content.value.strip()
+
+        self.employee_info.controls.clear()
+        self.result_text.value = ""
+
         if not full_name:
             self.result_text.value = "Пожалуйста, введите ФИО."
             self.result_text.color = ft.Colors.RED
@@ -217,7 +226,7 @@ class EmployeesPage:
 
         try:
             # Получаем данные о сотруднике
-            employee = get_one_with_employees_full_name(full_name=full_name)
+            employee = get_ecp_kriptopro_employee_name(full_name=full_name)
 
             # Для отладки: выводим информацию о сотруднике
             print(f"Найден сотрудник: {employee.full_name}, {employee.position}, {employee.com_name}")
@@ -230,12 +239,52 @@ class EmployeesPage:
 
             # Добавляем данные о сотруднике в ListView
             self.employee_info.controls.extend([
-                ft.Text(f"ФИО: {employee.full_name}", color=defaultFontColor),
-                ft.Text(f"Должность: {employee.position}", color=defaultFontColor),
-                ft.Text(f"Имя компьютера: {employee.com_name}", color=defaultFontColor),
-                # todo: в зависимости(ecp или kriptopro) у сотрудника будут разные поля
-            ])
+                ft.Text(f"Сотрудник: {employee.full_name}", color=ft.Colors.BLUE, size=22, weight=ft.FontWeight.BOLD, selectable=True),
+                ft.Text(f"Должность : {employee.position}", color=defaultFontColor,size=20),
+                ft.Text(f"Имя компьютера : {employee.com_name}", color=defaultFontColor,size=20),
+                ft.Divider(color=defaultBgColor),
 
+            ])
+            # Добавляем связанные данные (ecp и kriptos)
+            if employee.ecp:
+
+
+                for ecp_record in employee.ecp:
+                    finish_date = ecp_record.finish_date.date() if isinstance(ecp_record.finish_date, datetime) else ecp_record.finish_date
+                    days_left = (finish_date - datetime.now().date()).days
+                    finish_date_color = ft.Colors.RED if days_left <= 20 else defaultFontColor
+
+
+                    self.employee_info.controls.extend([
+                        ft.Text(f"ЕСП:", color=ft.Colors.BLUE, size=20, weight=ft.FontWeight.BOLD),
+                        ft.Text(f"Тип:ЕСП\t\t \t                {ecp_record.type_ecp}", color=defaultFontColor,size=18),
+                        ft.Text(f"Статус ЕСП:\t\t             {ecp_record.status_ecp}", color=defaultFontColor,size=18),
+                        ft.Text(f"Место установки:\t        {ecp_record.install_location}", color=defaultFontColor,size=18),
+                        ft.Text(f"Место хранения:\t         {ecp_record.storage_location}", color=defaultFontColor,size=18),
+                        ft.Text(f"Прим. к СБИС:\t        {ecp_record.sbis}", color=defaultFontColor,size=18),
+                        ft.Text(f"прим. к ЧЗ:\t\t          {ecp_record.chz}", color=defaultFontColor,size=18),
+                        ft.Text(f"Прим. к Диадок:\t      {ecp_record.diadok}", color=defaultFontColor,size=18),
+                        ft.Text(f"Прим. к ФНС:\t\t        {ecp_record.fns}", color=defaultFontColor,size=18),
+                        ft.Text(f"Прим. к отчетности:\t  {ecp_record.report}", color=defaultFontColor,size=18),
+                        ft.Text(f"Прим. к фед.рес:\t {ecp_record.fed_resours}", color=defaultFontColor,size=18),
+                        ft.Text(f"Дата начала:\t\t           {ecp_record.start_date}", color=defaultFontColor,size=18),
+                        ft.Text(f"Дата окончания:\t         {ecp_record.finish_date}", color=finish_date_color,size=18),
+                        ft.Divider(color=defaultBgColor),
+                    ])
+
+                if employee.kriptos:
+                    for kriptos_record in employee.kriptos:
+                        finish_date = kriptos_record.finish_date.date() if isinstance(kriptos_record.finish_date, datetime) else kriptos_record.finish_date
+                        days_left = (finish_date - datetime.now().date()).days
+                        finish_date_color = ft.Colors.RED if days_left <= 20 else defaultFontColor
+                        self.employee_info.controls.extend([
+                            ft.Text(f"КриптоПро: ", color=ft.Colors.BLUE, weight=ft.FontWeight.BOLD,size=18),
+                            ft.Text(f"Место установки: {kriptos_record.install_location}", color=defaultFontColor,size=18),
+                            ft.Text(f"Тип лицензии: {kriptos_record.licens_type}", color=defaultFontColor,size=18),
+                            ft.Text(f"Дата начала: {kriptos_record.start_date}", color=defaultFontColor,size=18),
+                            ft.Text(f"Дата окончания: {kriptos_record.finish_date}", color=finish_date_color,size=18),
+                            ft.Divider(color=defaultBgColor),
+                        ])
             # Обновляем страницу для отображения новых данных
             self.page.update()
 
@@ -249,7 +298,7 @@ class EmployeesPage:
             self.page.update()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Все сотрудники"
+        page.title = "Поиск сотрудника"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
@@ -280,13 +329,13 @@ class EmployeesPage:
                                             shape=ft.RoundedRectangleBorder(radius=8),
                                             padding=ft.padding.all(3),
                                         ),
-                                        on_click=lambda e: self.page.go("/dashboard"),
+                                        on_click=lambda e: self.page.go("/"),
                                     ),
                                     self.text_add,
                                     self.employee_full_name_input,
                                     self.find_button,
                                     self.result_text,
-                                    self.employee_info,  # Добавляем поле для информации о сотруднике
+                                    # self.employee_info,  # Добавляем поле для информации о сотруднике
                                 ],
                             ),
                         ),

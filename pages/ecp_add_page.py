@@ -11,6 +11,7 @@ from schemas.ecpies import EcpReqestAdd, EcpAdd
 from utils.style import *
 from crud.ecpies import create_ecp
 
+
 class AddEcpPage:
     def __init__(self, page: ft.Page):
         self.page = page  # основная страница приложения
@@ -38,8 +39,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="token", text="Токен"),
-                    ft.dropdown.Option(key="reestr", text="Реестр"),
+                    ft.dropdown.Option(key="Токен", text="Токен"),
+                    ft.dropdown.Option(key="Реестр", text="Реестр"),
                 ]
             ), border_radius=15)
 
@@ -51,8 +52,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="active", text="Работает"),
-                    ft.dropdown.Option(key="revoked", text="Отозван"),
+                    ft.dropdown.Option(key="Работает", text="Работает"),
+                    ft.dropdown.Option(key="Отозван", text="Отозван"),
                 ]
             ), border_radius=15)
         # место установки
@@ -84,8 +85,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="yes", text="Да"),
-                    ft.dropdown.Option(key="no", text="Нет"),
+                    ft.dropdown.Option(key="Да", text="Да"),
+                    ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
             ), border_radius=15)
 
@@ -98,8 +99,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="yes", text="Да"),
-                    ft.dropdown.Option(key="no", text="Нет"),
+                    ft.dropdown.Option(key="Да", text="Да"),
+                    ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
             ), border_radius=15)
 
@@ -112,8 +113,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="yes", text="Да"),
-                    ft.dropdown.Option(key="no", text="Нет"),
+                    ft.dropdown.Option(key="Да", text="Да"),
+                    ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
             ), border_radius=15)
 
@@ -126,8 +127,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="yes", text="Да"),
-                    ft.dropdown.Option(key="no", text="Нет"),
+                    ft.dropdown.Option(key="Да", text="Да"),
+                    ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
             ), border_radius=15)
 
@@ -140,8 +141,8 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="yes", text="Да"),
-                    ft.dropdown.Option(key="no", text="Нет"),
+                    ft.dropdown.Option(key="Да", text="Да"),
+                    ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
             ), border_radius=15)
 
@@ -154,12 +155,10 @@ class AddEcpPage:
                 filled=True,
                 color=secondaryFontColor,
                 options=[
-                    ft.dropdown.Option(key="yes", text="Да"),
-                    ft.dropdown.Option(key="no", text="Нет"),
+                    ft.dropdown.Option(key="Да", text="Да"),
+                    ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
             ), border_radius=15)
-
-
 
         self.start_date_input = ft.Container(
             content=ft.TextField(
@@ -193,6 +192,7 @@ class AddEcpPage:
 
         self.result_text = ft.Text("")
 
+    # Диалоговое окно для подтверждения добавления ECP
 
     def submit_form(self, e):
 
@@ -225,8 +225,8 @@ class AddEcpPage:
                 if employee is None:
                     self.result_text.value = "Сотрудник не найден в базе данных.\nВедите ФИО сотрудника. или добавьте сотрудника в базу данных."
                     self.result_text.color = ft.Colors.RED
-                    return
-                print(f"сотрудник в методе submit_form: ",employee)
+
+                print(f"сотрудник в методе submit_form: ", employee)
                 # напишем функцию для добавления объекта ecp в базу данных
                 create_ecp(employees_id=employee.id, ecp_data=EcpReqestAdd(
                     type_ecp=type_ecp_or_token,
@@ -240,7 +240,7 @@ class AddEcpPage:
                     report=report,
                     fed_resours=fed_resours,
                     start_date=start_date,
-                    finish_date=finish_date),)
+                    finish_date=finish_date), )
                 self.result_text.value = f"Сотруднику {employee.full_name} добавлен ECP."
                 self.result_text.color = ft.Colors.GREEN
                 self.page.update()
@@ -249,20 +249,19 @@ class AddEcpPage:
                 # Обнуляем поля формы
                 self.employee_full_name_input.content.value = ""
                 self.type_ecp_or_token_input.content.value = ""
-                self.status_ecp_input.content.value = "",
-                self.install_location_input.content.value = "",
-                self.storage_location_input.content.value = "",
-                self.sbis_input.content.value = "",
-                self.cz_input.content.value = "",
-                self.diadok_input.content.value = "",
-                self.fns_input.content.value = "",
-                self.report_input.content.value = "",
-                self.fed_resours_input.content.value = "",
-                self.start_date_input.content.value = "",
+                self.status_ecp_input.content.value = ""
+                self.install_location_input.content.value = ""
+                self.storage_location_input.content.value = ""
+                self.sbis_input.content.value = ""
+                self.cz_input.content.value = ""
+                self.diadok_input.content.value = ""
+                self.fns_input.content.value = ""
+                self.report_input.content.value = ""
+                self.fed_resours_input.content.value = ""
+                self.start_date_input.content.value = ""
                 self.finish_date_input.content.value = ""
 
             except ValueError as er:
-
 
                 self.employee_full_name_input.content.value = ""
                 self.type_ecp_or_token_input.content.value = ""
@@ -286,12 +285,6 @@ class AddEcpPage:
                 self.result_text.color = ft.Colors.RED
 
         self.page.update()
-
-
-    # проверка на заполненность полей
-
-
-
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
         page.title = "Добавление сотрудников"
@@ -323,7 +316,7 @@ class AddEcpPage:
                                                       shape=ft.RoundedRectangleBorder(radius=8),  # Округлённые углы
                                                       padding=ft.padding.all(12),  # Внутренние отступы
                                                   ),
-                                                  on_click=lambda e: self.page.go("/")
+                                                  on_click=lambda e: self.page.go("/"),
                                                   ),  # Обработчик клика (переход на главную страницу)
                                     self.text_add,
                                     self.employee_full_name_input,
@@ -339,6 +332,7 @@ class AddEcpPage:
                                     self.fed_resours_input,
                                     self.start_date_input,
                                     self.finish_date_input,
+                                    self.result_text,
 
                                     self.employee_save_button
 

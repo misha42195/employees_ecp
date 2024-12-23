@@ -88,7 +88,7 @@ class UpdateEmployeesPage:
                                                       shape=ft.RoundedRectangleBorder(radius=8),  # Округлённые углы
                                                       padding=ft.padding.all(12),  # Внутренние отступы
                                                   ),
-                                                  on_click=lambda e: self.page.go("/")
+                                                  on_click=lambda e: self.page.go("/"),
                                                   ),  # Обработчик клика (переход на главную страницу)
                                     self.text_add,
                                     self.employee_full_name_input,

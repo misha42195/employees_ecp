@@ -37,8 +37,8 @@ class DashboardPage:
             content=ft.Column(
                 controls=[
                     ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    ft.TextButton("Список сотрудников", icon=ft.Icons.WORK, style=style_menu,
-                                  on_click=lambda e: self.page.go("/")),
+                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
+                                  on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
@@ -49,8 +49,7 @@ class DashboardPage:
                                   on_click=lambda e: self.page.go("/update_employees")),
                     ft.TextButton("Удалить сотрудника на хуй", icon=ft.Icons.DELETE, style=style_menu,
                                   on_click=lambda e: self.page.go("/delete_employees")),
-                     ft.TextButton("Панель управления", icon=ft.Icons.DELETE, style=style_menu,
-                                  on_click=lambda e: self.page.go("/dashboard")),
+
                 ]
             )
 
@@ -64,7 +63,7 @@ class DashboardPage:
                     controls=[
                         # left side
                         ft.Container(
-                            expand=1,
+                            expand=2,
                             content=ft.Column(
                                 controls=[
                                     sidebar_menu
@@ -72,6 +71,11 @@ class DashboardPage:
                             ),
                             bgcolor=secondaryBgColor
                         ),
+
+                        ft.Container(
+                            expand=4,
+                            image_src="assets/salavat.jpg",
+                            image_fit=ft.ImageFit.COVER,)
                     ]
                 )
             ],

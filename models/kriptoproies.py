@@ -1,6 +1,6 @@
 
 from sqlalchemy import String, Column, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datetime import date
 from database import Base
@@ -13,3 +13,6 @@ class KriptosORM(Base):
     licens_type: Mapped[str] = mapped_column(String)
     start_date: Mapped[date] = mapped_column()
     finish_date: Mapped[date] = mapped_column()
+
+    # Обратная связь с EmployeesORM
+    employee = relationship("EmployeesORM", back_populates="kriptos")

@@ -1,5 +1,5 @@
 from sqlalchemy import String, Column, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datetime import date
 
@@ -23,3 +23,6 @@ class EcpORM(Base):
     fed_resours: Mapped[str] = mapped_column(String)  # Применим к фед. ресурсу (да/нет)
     start_date: Mapped[date] = mapped_column(DateTime)  # начала лицензии
     finish_date: Mapped[date] = mapped_column(DateTime)  # окончания лицензии
+
+# Обратная связь с EmployeesORM
+    employee = relationship("EmployeesORM", back_populates="ecp")

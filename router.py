@@ -14,13 +14,14 @@ class Router:
     def __init__(self, page: ft.Page):
         self.page = page
         self.app_routes = [
-            path(url="/", clear=False, view=EmployeesPage(page=self.page).view),
+            path(url="/", clear=False, view=DashboardPage(page=self.page).view),
+            path(url="/employees", clear=False, view=EmployeesPage(page=self.page).view),
             path(url="/add_employees", clear=False, view=AddEmployeesPage(page=self.page).view),
             path(url="/add_ecp", clear=False, view=AddEcpPage(page=self.page).view),
             path(url="/add_crypto", clear=False, view=AddKriptoproPage(page=self.page).view),
             path(url="/update_employees", clear=False, view=UpdateEmployeesPage(page=self.page).view),
             path(url="/delete_employees", clear=False, view=DeleteEmployeesPage(page=self.page).view),
-            path(url="/dashboard", clear=False, view=DashboardPage(page=self.page).view),
+            #path(url="/dashboard", clear=False, view=DashboardPage(page=self.page).view),
         ]
 
         Routing(

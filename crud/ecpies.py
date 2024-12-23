@@ -3,7 +3,7 @@ from sqlalchemy import select, insert, update, delete
 
 from crud.dependensis import PaginationParams, PaginationDep
 from models.ecpes import EcpORM
-from database import async_session_maker, engine
+from database import session_maker, engine
 from schemas.ecpies import EcpAdd, EcpReqestAdd, EcpPatch, EcpPut
 
 from models.kriptoproies import KriptosORM
@@ -13,7 +13,7 @@ def get_all_ecp(
     page = 1,
     per_page = 10
 ):
-    async with async_session_maker() as session:
+    with session_maker() as session:
         query = select(EcpORM).limit(per_page).offset(per_page * (page - 1))
         print(query.compile(compile_kwargs={"literal_binds": True}))
         result = session.execute(query)
@@ -26,7 +26,7 @@ def get_one_ecp(
     install_location:str,
     storage_location
 ):
-    async with async_session_maker() as session:
+    with session_maker() as session:
         query = select(EcpORM)
         if install_location is not None:
             query = query.filter(EcpORM.install_location.ilike(f"%{install_location}%"))
@@ -41,7 +41,7 @@ def get_one_ecp(
 
 
 def get_one_ecp(ecp_id: int):
-     with async_session_maker() as session:
+     with session_maker() as session:
         query = select(EcpORM).filter_by(id=ecp_id)
         print(query.compile(engine, compile_kwargs={"literal_binds": True}))
         result = session.execute(query)
@@ -54,7 +54,7 @@ def create_ecp(
     employees_id: int,
     ecp_data: EcpReqestAdd):
 
-    with async_session_maker() as session:
+    with session_maker() as session:
         _ecp_data = EcpAdd(employees_id=employees_id, **ecp_data.model_dump())
         ecp_data_stmt = insert(EcpORM).values(_ecp_data.model_dump()).returning(EcpORM)
         print(ecp_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
@@ -70,7 +70,7 @@ def full_update_ecp(
     ecp_id: int,
     ecp_data: EcpPut):
     _ecp_data = EcpPut(**ecp_data.model_dump())
-    async with async_session_maker() as session:
+    with session_maker() as session:
         ecp_update_stmt = (
             update(EcpORM).
             filter_by(id=ecp_id, employees_id=employees_id).
@@ -88,7 +88,7 @@ def update_ecp(
     ecp_data: EcpPatch):
     _ecp_data = EcpPatch(**ecp_data.model_dump(exclude_unset=True))
     print(_ecp_data)
-    async with async_session_maker() as session:
+    with session_maker() as session:
         update_ecp_stmt = (update(EcpORM).
                            filter_by(id=ecp_id, employees_id=employees_id).
                            values(**_ecp_data.model_dump(exclude_unset=True))
@@ -102,7 +102,7 @@ def delete_ecp(
     employees_id: int,
     ecp_id: int
 ):
-    with async_session_maker() as session:
+    with session_maker() as session:
         ecp_delete_stmt = (delete(EcpORM).
                            filter_by(id=ecp_id, employees_id=employees_id)
                            .returning(EcpORM))
