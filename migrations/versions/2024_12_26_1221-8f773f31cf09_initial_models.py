@@ -1,8 +1,8 @@
-"""update kriptopro model
+"""Initial models
 
-Revision ID: 045489601dd5
-Revises: 5b1287175e57
-Create Date: 2024-12-19 09:48:52.569059
+Revision ID: 8f773f31cf09
+Revises:
+Create Date: 2024-12-26 12:21:32.162204
 
 """
 
@@ -13,13 +13,22 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "045489601dd5"
-down_revision: Union[str, None] = "5b1287175e57"
+revision: str = "8f773f31cf09"
+down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    op.create_table(
+        "employees",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("full_name", sa.String(length=100), nullable=False),
+        sa.Column("position", sa.String(length=100), nullable=False),
+        sa.Column("com_name", sa.String(length=100), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("full_name"),
+    )
     op.create_table(
         "ecp",
         sa.Column("id", sa.Integer(), nullable=False),
@@ -34,8 +43,8 @@ def upgrade() -> None:
         sa.Column("fns", sa.String(), nullable=False),
         sa.Column("report", sa.String(), nullable=False),
         sa.Column("fed_resours", sa.String(), nullable=False),
-        sa.Column("start_date", sa.DateTime(), nullable=False),
-        sa.Column("finish_date", sa.DateTime(), nullable=False),
+        sa.Column("start_date", sa.Date(), nullable=False),
+        sa.Column("finish_date", sa.Date(), nullable=False),
         sa.ForeignKeyConstraint(
             ["employees_id"],
             ["employees.id"],
@@ -58,6 +67,8 @@ def upgrade() -> None:
     )
 
 
+
 def downgrade() -> None:
     op.drop_table("kriptos")
     op.drop_table("ecp")
+    op.drop_table("employees")

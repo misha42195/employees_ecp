@@ -45,8 +45,8 @@ class DashboardPage:
                                   on_click=lambda e: self.page.go("/add_ecp")),
                     ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_crypto")),
-                    ft.TextButton("Обновить данные сотрудника", icon=ft.Icons.UPDATE, style=style_menu,
-                                  on_click=lambda e: self.page.go("/update_employees")),
+                    # ft.TextButton("Обновить данные сотрудника", icon=ft.Icons.UPDATE, style=style_menu,
+                    #               on_click=lambda e: self.page.go("/update_employees")),
                     ft.TextButton("Удалить сотрудника на хуй", icon=ft.Icons.DELETE, style=style_menu,
                                   on_click=lambda e: self.page.go("/delete_employees")),
 

@@ -1,19 +1,20 @@
-from oauthlib.uri_validate import query
-from pydantic import BaseModel
-from sqlalchemy import select, insert, func
+from datetime import datetime, timedelta
+from typing import List, Tuple
+
+from sqlalchemy import select, insert, func, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
+from models.ecpes import EcpORM
+from models.kriptoproies import KriptosORM
 from schemas.employees import Employee, EmployeeAdd, EmployeePost
 
 from schemas.employees import EmployeePatch
-from crud.dependensis import PaginationDep
+
 from database import session_maker, engine
 from repositories.employees import EmployeesRepository
 from exetions.exeption_ import EmployeeNotFoundException
 from models.employess import EmployeesORM
-
-
 
 
 def get_one_with_employees_full_name(full_name=None):
@@ -27,12 +28,14 @@ def get_one_with_employees_full_name(full_name=None):
         return model
 
     # Добавление сотрудника
+
+
 def get_ecp_kriptopro_employee_name(full_name=None):
     with session_maker() as session:
         query = (select(EmployeesORM).
-                 options(joinedload(EmployeesORM.ecp),
-                        joinedload(EmployeesORM.kriptos)
-                        ).where(
+        options(joinedload(EmployeesORM.ecp),
+                joinedload(EmployeesORM.kriptos)
+                ).where(
             func.lower(EmployeesORM.full_name).like(f"%{full_name}%")))
         print(query.compile(compile_kwargs={"literal_binds": True}))
 
@@ -44,6 +47,7 @@ def get_ecp_kriptopro_employee_name(full_name=None):
         return model
 
     # Добавление сотрудника
+
 
 def add_employee(employee_data: EmployeePost):
     with session_maker() as session:
@@ -68,11 +72,60 @@ def add_employee(employee_data: EmployeePost):
             raise ValueError(f"Ошибка при добавлении сотрудника: {str(e)}")
 
 
+def get_employees_with_expiring_licenses() -> List[
+    Tuple[EmployeesORM, List[EcpORM], List[KriptosORM]]]:
+    """
+    Возвращает список сотрудников с близким окончанием срока лицензии, а также их связанные объекты ECP и Kriptos.
+    """
+    current_date = datetime.now()
+    date_limit = current_date + timedelta(days=20)
+
+    with session_maker() as session:
+        result = []
+
+        # Получаем сотрудников с заканчивающимися лицензиями на ECP
+        ecp_stmt = (
+            select(EmployeesORM, EcpORM)
+            .join(EcpORM, EmployeesORM.ecp)
+            .where(EcpORM.finish_date <= date_limit)
+        )
+        ecps = session.execute(ecp_stmt).all()
+
+        # Получаем сотрудников с заканчивающимися лицензиями на Kriptos
+        kriptos_stmt = (
+            select(EmployeesORM, KriptosORM)
+            .join(KriptosORM, EmployeesORM.kriptos)
+            .where(KriptosORM.finish_date <= date_limit)
+        )
+        kriptos = session.execute(kriptos_stmt).all()
+
+        # Группируем результаты по сотрудникам
+        employee_dict = {}
+
+        for employee, ecp in ecps:
+            if employee not in employee_dict:
+                employee_dict[employee] = {"ecp": [], "kriptos": []}
+            employee_dict[employee]["ecp"].append(ecp)
+
+        for employee, kripto in kriptos:
+            if employee not in employee_dict:
+                employee_dict[employee] = {"ecp": [], "kriptos": []}
+            employee_dict[employee]["kriptos"].append(kripto)
+
+        # Формируем итоговый список
+        for employee, related_objects in employee_dict.items():
+            result.append((employee, related_objects["ecp"], related_objects["kriptos"]))
+
+        return result
+
+
 def delete_employee(
     employee_id: int,
 ):
     with session_maker() as session:
-        EmployeesRepository(session).delete(id=employee_id)
+        delete_empl_stmt = delete(EmployeesORM).where(EmployeesORM.id == employee_id)
+        print(delete_empl_stmt.compile(compile_kwargs={"literal_binds":True}))
+        session.execute(delete_empl_stmt)
         session.commit()
 
 

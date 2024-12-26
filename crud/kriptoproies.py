@@ -1,6 +1,11 @@
+from datetime import datetime, timedelta
+
 from sqlalchemy import select, insert, update, delete
 
 from fastapi import APIRouter, Body
+from sqlalchemy.orm import joinedload
+
+from models.ecpes import EcpORM
 from models.kriptoproies import KriptosORM
 from schemas.kriptopro import KriptoproRequestAdd, KriptoproPut, KriptoproPath, KriptoproRequestAdd
 from schemas.kriptopro import KriptoproAdd
@@ -26,7 +31,7 @@ def create_kriptopro(
     with session_maker() as session:
         _kriptopro_data = KriptoproAdd(employees_id=employees_id, **kriptopro_data.model_dump())
         kriptopro_data_stmt = insert(KriptosORM).values(_kriptopro_data.model_dump()).returning(KriptosORM)
-        print(kriptopro_data_stmt.compile(engine,compile_kwargs={"literral_binds":True}))
+        print(kriptopro_data_stmt.compile(engine, compile_kwargs={"literral_binds": True}))
         result = session.execute(kriptopro_data_stmt)
         kripto = result.scalars().one()
         session.commit()
@@ -81,3 +86,18 @@ def delete_kriptopro(
         session.commit()
 
         return {"status": "ok", "ecp": kripto}
+
+
+# функция для получения всех криптопро с истекающими лицензиями
+def get_expiring_kripropro():
+    today = datetime.today()
+    warning_day = today + timedelta(days=20)
+    with session_maker() as session:
+        query = (select(KriptosORM).
+                 options(joinedload(KriptosORM.employee)).
+                 filter(KriptosORM.finish_date <= warning_day))
+        print(query.compile(compile_kwargs={"literal_binds": True}))
+        result = session.execute(query)
+        expiring_kriptos = result.scalars().all()
+        print(expiring_kriptos)
+        return expiring_kriptos

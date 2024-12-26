@@ -1,5 +1,8 @@
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Query, Body
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import select, insert, update, delete, literal
+from sqlalchemy.orm import joinedload
 
 from crud.dependensis import PaginationParams, PaginationDep
 from models.ecpes import EcpORM
@@ -112,3 +115,23 @@ def delete_ecp(
         session.commit()
 
         return {"status":"ok","ecp":ecp}
+
+
+
+def get_expiring_ecp():
+    today = datetime.today()
+    warning_day = today + timedelta(days=20)
+
+    # Получаем все записи из таблицы EcpORM с заканчивающимися лицензиями и заранее подгружаем связанные сущности
+    with session_maker() as session:
+        query = (
+            select(EcpORM)
+            .options(joinedload(EcpORM.employee))  # Подгружаем данные о сотрудниках
+            .filter(EcpORM.finish_date <= warning_day)
+        )
+        print(query.compile(compile_kwargs={"literal_binds": True}))
+        result = session.execute(query)
+        expiring_ecp = result.scalars().all()
+        print(expiring_ecp)
+
+        return expiring_ecp
