@@ -26,9 +26,9 @@ class DashboardPage:
             )
 
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=14,
+                                    icon_size=30,
                                     overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor
+                                    shadow_color=hoverBgColor,
                                     )
 
         # Панель сайдбар

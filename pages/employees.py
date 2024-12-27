@@ -31,6 +31,8 @@ class EmployeesPage:
             color=defaultFontColor,
             weight=ft.FontWeight.NORMAL,
             text_align=ft.TextAlign.LEFT,
+
+
         )
         self.employee_full_name_input = ft.Container(
             content=ft.TextField(
@@ -48,6 +50,7 @@ class EmployeesPage:
             on_click=self.submit_form,  # Привязка кнопки к обработчику
             bgcolor=defaultBgColor,
             color=defaultFontColor,
+            height=40,
         )
 
     def submit_form(self, e):
@@ -158,15 +161,17 @@ class EmployeesPage:
                                 controls=[
                                     ft.TextButton(
                                         "Домой",
-                                        icon=ft.Icons.HOME,
+                                        icon=ft.Icons.HOUSE,
                                         style=ft.ButtonStyle(
                                             color={
                                                 ft.ControlState.HOVERED: ft.Colors.BLUE,
                                                 ft.ControlState.DEFAULT: ft.Colors.BLACK,
                                             },
-                                            shape=ft.RoundedRectangleBorder(radius=8),
+                                            shape=ft.RoundedRectangleBorder(radius=20),
                                             padding=ft.padding.all(3),
                                         ),
+
+
                                         on_click=lambda e: self.page.go("/"),
                                     ),
                                     self.text_add,
