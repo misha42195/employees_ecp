@@ -6,7 +6,7 @@ authors = ["mi42195 <aptraev.mv@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.11,<3.14"
 requests = "^2.32.3"
 flet = "^0.25.0"
 pydantic = "^2.10.2"
@@ -17,6 +17,7 @@ psycopg2 = "^2.9.10"
 alembic = "^1.14.0"
 black = "^24.10.0"
 python-telegram-bot = "^21.9"
+pyinstaller = "^6.11.1"
 
 
 [build-system]

@@ -10,7 +10,7 @@ class EcpORM(Base):
     __tablename__ = 'ecp'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    employees_id: Mapped[int] = mapped_column(ForeignKey("employees.id"))
+    employees_id: Mapped[int] = mapped_column(ForeignKey("employees.id",ondelete="CASCADE"))
     type_ecp: Mapped[str] = mapped_column(String)  # Тип контейнера (токен/реестр)
     status_ecp: Mapped[str] = mapped_column(String)  # Статус (работает/отозван)
     install_location: Mapped[str] = mapped_column(String)  # Место установки

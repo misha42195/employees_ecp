@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta
-from pyexpat.errors import messages
+from datetime import datetime
 
-from crud.ecpies import get_expiring_ecp
 from crud.employees import get_employees_with_expiring_licenses
-from crud.kriptoproies import get_expiring_kripropro
 
 
 
-def create_notification() -> str:
+def create_notification():
     employees_with_objects = get_employees_with_expiring_licenses()
-
+    print(f"данные {employees_with_objects}")
+    if not employees_with_objects:
+        return None
     # Формируем сообщения
     messages = []
     for employee, ecps, kriptos in employees_with_objects:
@@ -31,7 +30,3 @@ def create_notification() -> str:
 
     # Объединяем все сообщения в одно
     return "\n\n".join(messages)
-
-# Пример использования:
-# notification_message = create_notification()
-# print(notification_message)

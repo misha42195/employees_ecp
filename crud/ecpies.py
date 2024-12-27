@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Query, Body
-from sqlalchemy import select, insert, update, delete, literal
+
+from sqlalchemy import select, insert, update, delete
 from sqlalchemy.orm import joinedload
 
-from crud.dependensis import PaginationParams, PaginationDep
+
 from models.ecpes import EcpORM
 from database import session_maker, engine
 from schemas.ecpies import EcpAdd, EcpReqestAdd, EcpPatch, EcpPut
 
-from models.kriptoproies import KriptosORM
 
 
 def get_all_ecp(

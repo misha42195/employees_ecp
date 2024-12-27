@@ -13,13 +13,12 @@ from schemas.employees import EmployeePatch
 
 from database import session_maker, engine
 from repositories.employees import EmployeesRepository
-from exetions.exeption_ import EmployeeNotFoundException
+
 from models.employess import EmployeesORM
 
 
 def get_one_with_employees_full_name(full_name=None):
     with session_maker() as session:
-        # query = select(EmployeesORM).where(EmployeesORM.full_name.ilike(f"%{full_name.lower()}%"))
         query = select(EmployeesORM).where(func.lower(EmployeesORM.full_name).like(f"%{full_name}%"))
         print(query.compile(compile_kwargs={"literal_binds": True}))
         result = session.execute(query)
@@ -46,7 +45,6 @@ def get_ecp_kriptopro_employee_name(full_name=None):
         print(model)
         return model
 
-    # Добавление сотрудника
 
 
 def add_employee(employee_data: EmployeePost):
@@ -55,7 +53,6 @@ def add_employee(employee_data: EmployeePost):
 
         ext_employee = session.execute(select(EmployeesORM).filter_by(full_name=_employee_data.full_name)).scalar()
         if ext_employee:
-            # Если сотрудник с таким именем уже существует, выбрасываем ошибку
             raise ValueError(f"Сотрудник с именем '{_employee_data.full_name}' уже существует.")
 
         try:
@@ -68,22 +65,19 @@ def add_employee(employee_data: EmployeePost):
             return employees
         except IntegrityError as e:
             session.rollback()
-            # В случае ошибки вставки (например, нарушение уникальности) возвращаем соответствующую ошибку
             raise ValueError(f"Ошибка при добавлении сотрудника: {str(e)}")
 
 
 def get_employees_with_expiring_licenses() -> List[
     Tuple[EmployeesORM, List[EcpORM], List[KriptosORM]]]:
-    """
-    Возвращает список сотрудников с близким окончанием срока лицензии, а также их связанные объекты ECP и Kriptos.
-    """
+
     current_date = datetime.now()
     date_limit = current_date + timedelta(days=20)
 
     with session_maker() as session:
         result = []
 
-        # Получаем сотрудников с заканчивающимися лицензиями на ECP
+
         ecp_stmt = (
             select(EmployeesORM, EcpORM)
             .join(EcpORM, EmployeesORM.ecp)
@@ -91,7 +85,7 @@ def get_employees_with_expiring_licenses() -> List[
         )
         ecps = session.execute(ecp_stmt).all()
 
-        # Получаем сотрудников с заканчивающимися лицензиями на Kriptos
+
         kriptos_stmt = (
             select(EmployeesORM, KriptosORM)
             .join(KriptosORM, EmployeesORM.kriptos)
@@ -99,7 +93,7 @@ def get_employees_with_expiring_licenses() -> List[
         )
         kriptos = session.execute(kriptos_stmt).all()
 
-        # Группируем результаты по сотрудникам
+
         employee_dict = {}
 
         for employee, ecp in ecps:

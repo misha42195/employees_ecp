@@ -341,7 +341,7 @@ class AddEcpPage:
                         ),
                         ft.Container(
                             expand=4,
-                            image_src="assets/salavat.jpg",
+                            image_src="assert/salavat.jpg",
                             image_fit=ft.ImageFit.COVER,
                         )
                     ]
