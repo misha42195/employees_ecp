@@ -10,9 +10,17 @@ CHAT_ID = settings.CHAT_ID
 
 bot = Bot(token=API_TOKEN)
 
-# chat_ids = [123456789, 987654321, 1122334455]
+
+# Список ID чатов, куда нужно отправить уведомления
+chat_ids = [1617521485]  # Добавьте сюда другие chat_id, если нужно
+
+
 async def send_telegram_notification():
-    message = create_notification()
-    # for chat_id in chat_ids:
-    # await send_telegram_notification(chat_id, message)
-    await bot.send_message(chat_id=CHAT_ID, text=message)
+    message = create_notification()  # Предполагается, что эта функция создаёт текст уведомления
+    print(message)
+    for chat_id in chat_ids:
+        try:
+            await bot.send_message(chat_id=chat_id, text=message)
+            print(f"Сообщение отправлено в чат {chat_id}")
+        except Exception as e:
+            print(f"Ошибка при отправке сообщения в чат {chat_id}: {e}")

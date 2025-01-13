@@ -17,8 +17,7 @@ class AddEmployeesPage:
         # Элементы интерфейса
         self.text_add = ft.Text("Добавление сотрудника", color=defaultFontColor,
                                 weight=ft.FontWeight.NORMAL,
-                                text_align=ft.TextAlign.LEFT
-                                )
+                                text_align=ft.TextAlign.LEFT)
 
         # Поля ввода для "Сотрудника"
         self.employee_full_name_input = ft.Container(
@@ -42,6 +41,7 @@ class AddEmployeesPage:
             ),
             border_radius=15,
         )
+
         self.employee_com_name_input = ft.Container(
             content=ft.TextField(
                 label="Введите имя компьютера",
@@ -83,6 +83,7 @@ class AddEmployeesPage:
                 self.result_text.value = f"Сотрудник '{full_name}' успешно добавлен!"
                 self.page.update()
                 time.sleep(2)
+
                 self.result_text.value = ""
                 # Обнуляем поля формы
                 self.employee_full_name_input.content.value = ""
@@ -103,6 +104,7 @@ class AddEmployeesPage:
                 self.result_text.color = ft.Colors.RED
 
         self.page.update()
+
 
     # Элементы интерфейса
     text_add = ft.Text("Добавление сотрудника", color=defaultFontColor,

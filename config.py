@@ -17,9 +17,7 @@ class Settings(BaseSettings):
     def DB_URL(self):
         return f"sqlite:///{self.DB_NAME}"
 
-    #model_config = SettingsConfigDict(env_file=".env")
-    # class Config:
-    #     env_file = ".env"
-    #     env_file_encoding = 'utf-8'
+    model_config = SettingsConfigDict(env_file=".env")
+
 
 settings = Settings()

@@ -12,18 +12,13 @@ from model import Employee
 class EmployeesPage:
     def __init__(self, page: ft.Page):
         self.page = page  # основная страница приложения
-        self.employee_info = ft.ListView(
-            controls=[],
-            expand=True,
-            auto_scroll=True
-        )
-
         # Элементы интерфейса
         self.result_text = ft.Text("", color=ft.Colors.BLACK)
+
         self.employee_info = ft.ListView(
             controls=[],
             expand=True,
-            auto_scroll=True
+            # auto_scroll=True
         )
 
         self.text_add = ft.Text(
