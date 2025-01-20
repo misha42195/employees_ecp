@@ -5,7 +5,7 @@ from flet_route import Routing, path
 
 from pages.ecp_add_page import AddEcpPage
 from pages.employees_add_page import AddEmployeesPage
-from pages.employees_delete_page import DeleteEmployeesPage
+from pages.employees_info_page import  EmployeesInfoPage
 from pages.employees import EmployeesPage
 from pages.employess_update_page import UpdateEmployeesPage
 from pages.dashboard import DashboardPage
@@ -22,7 +22,7 @@ class Router:
             path(url="/add_ecp", clear=False, view=AddEcpPage(page=self.page).view),
             path(url="/add_crypto", clear=False, view=AddKriptoproPage(page=self.page).view),
             path(url="/update_employees", clear=False, view=UpdateEmployeesPage(page=self.page).view),
-            # path(url="/delete_employees", clear=False, view=DeleteEmployeesPage(page=self.page).view),
+            path(url="/employees_info", clear=False, view=EmployeesInfoPage(page=self.page).view),
             # path(url="/dashboard", clear=False, view=DashboardPage(page=self.page).view),
         ]
 

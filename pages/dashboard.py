@@ -1,11 +1,12 @@
-import functools
+import time
 from datetime import datetime
 from math import ceil
 
 import flet as ft
 from flet_route import Params, Basket
+from sqlalchemy.orm.sync import update
 
-from crud.employees import get_all_employees_ecp_kripto, delete_employee
+from crud.employees import get_all_employees_ecp_kripto, delete_employee, update_employee, add_employee
 from utils.style import *
 
 
@@ -24,23 +25,20 @@ class DashboardPage:
         self.result_text = ft.Text()
         self.load_employees()
 
-    def edit_employee(self,employee):
-        """Метод для перехода на страницу редактирования сотрудника."""
-        self.page.go(f"/update_employees")
-
-
     def update_pagination_controls(self):
         """Обновляет элементы управления пагинацией."""
         self.pagination_controls.controls.clear()
         self.pagination_controls.controls.extend([
-            ft.ElevatedButton(
+            ft.Button(
                 "Предыдущая",
+                color=menuFontColor,
                 on_click=lambda e: self.go_to_page(self.current_page - 1),
                 disabled=self.current_page <= 1  # Отключаем кнопку на первой странице
             ),
-            ft.Text(f"Страница {self.current_page} из {self.total_pages}"),
+            ft.Text(f"Страница {self.current_page} из {self.total_pages}", color=ft.Colors.WHITE),
             ft.ElevatedButton(
                 "Следующая",
+                color=menuFontColor,
                 on_click=lambda e: self.go_to_page(self.current_page + 1),
                 disabled=self.current_page >= self.total_pages  # Отключаем кнопку на последней странице
             )
@@ -58,6 +56,8 @@ class DashboardPage:
             self.result_text.value = f"Сотрудник {employee.full_name} успешно удалён."
             self.result_text.color = ft.Colors.GREEN
             self.page.update()
+            time.sleep(2)
+            self.result_text.value = ""
 
         except Exception as ex:
             self.result_text.value = f"Ошибка при удалении: {str(ex)}"
@@ -65,73 +65,59 @@ class DashboardPage:
             self.page.update()
         self.load_employees()
 
+    # переход на страницу обновления данных сотрудника
+    def edit_employee(self, employee_id, employee_name):
+        print(employee_id)
+        print(employee_name)
+
+        self.page.session.set("employee_id", employee_id)  # установка id для глобальной страницы
+
+        # self.page.go(f"/update_employees?employee_id={employee_id}")
+        self.page.go(f"/update_employees")
+        self.page.update()
+
+    def show_employee_info(self, empl_id: int):
+        self.page.session.set("empl_id", empl_id)
+        print(f"dashboard, {empl_id}"),
+
+        self.page.go(f"/employees_info")
+
+    def add_certificate_row(self, title, finish_date, days_left, color):
+        """Добавление строки с сертификатом (ЕЦП или КриптоПро)."""
+        finish_date_color = color if days_left <= 20 else ft.Colors.WHITE
+        return ft.DataCell(
+            ft.Text(f"{title}: дата окончания: {finish_date}", color=finish_date_color, expand=1),
+        )
+
+
+
+
     def load_employees(self):
         """Загрузка данных сотрудников для текущей страницы."""
-        try:
-            # Получаем все данные из базы
-            employees = get_all_employees_ecp_kripto()
 
+        try:
+            employees = get_all_employees_ecp_kripto()
             if not employees:
                 self.result_text.value = "Нет сотрудников в базе."
                 self.result_text.color = ft.Colors.RED
-                # Очищаем предыдущие данные
                 self.employee_info.controls.clear()
                 self.page.update()
-
                 return
 
-            # Рассчитываем общее количество страниц
+            # Расчёт данных для текущей страницы
             self.total_pages = ceil(len(employees) / self.page_size)
-
-            # Определяем данные для текущей страницы
             start_index = (self.current_page - 1) * self.page_size
             end_index = start_index + self.page_size
             page_employees = employees[start_index:end_index]
 
-            # Очищаем предыдущие данные
             self.employee_info.controls.clear()
 
-            # Добавляем сотрудников для текущей страницы
             for employee_tuple in page_employees:
                 employee = employee_tuple[0]
-                # Информация о сотруднике
 
-                # Информация о сотруднике с кнопками справа
-                employee_row = ft.Row(
-                    controls=[
-                        ft.Text(f"Сотрудник: {employee.full_name}", color=ft.Colors.WHITE, expand=1),  # Текст занимает всё доступное место
-                        ft.Row(  # Контейнер для кнопок
-                            controls=[
-                                ft.ElevatedButton(
-                                  "Посмотреть данные",
-                                    color=menuFontColor,
-                                    on_click=lambda e: self.page.go(f"/employees/{employee.id}"),
-
-                                ),
-                                ft.ElevatedButton(
-                                    "Редактировать",
-                                    color=menuFontColor,
-                                    on_click=lambda e: self.edit_employee(employee),
-                                ),
-                                ft.ElevatedButton(
-                                    "Удалить",
-                                    color=ft.Colors.RED,
-                                    on_click=lambda e: self.delete_employee(employee),
-                                ),
-                            ],
-                            spacing=10  # Расстояние между кнопками
-                        ),
-                    ],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN  # Кнопки располагаются справа
-                )
-
-                self.employee_info.controls.append(employee_row)
-
-                # Информация о ЕЦП
+                # Сбор информации об ЭЦП
+                ecp_data = []
                 if employee.ecp:
-                    ecp_texts = [
-                        ft.Text("ЭЦП:", color=ft.Colors.WHITE)
-                    ]
                     for ecp_record in employee.ecp:
                         finish_date = (
                             ecp_record.finish_date.date()
@@ -139,19 +125,13 @@ class DashboardPage:
                             else ecp_record.finish_date
                         )
                         days_left = (finish_date - datetime.now().date()).days
-                        finish_date_color = ft.Colors.RED if days_left <= 20 else ft.Colors.WHITE
+                        ecp_data.append(f"{finish_date} ({days_left} дней осталось)")
 
-                        ecp_texts.extend([
-                            ft.Text(f"Дата окончания: {finish_date}", color=finish_date_color),
-                            ft.Divider()
-                        ])
-                    self.employee_info.controls.append(ft.Column(controls=ecp_texts))
+                ecp_info = "\n".join(ecp_data) if ecp_data else "Нет данных"
 
-                # Информация о КриптоПро
+                # Сбор информации о КриптоПро
+                kripto_data = []
                 if employee.kriptos:
-                    kripto_texts = [
-                        ft.Text("Криптопро:", color=ft.Colors.WHITE)
-                    ]
                     for kripto_record in employee.kriptos:
                         finish_date = (
                             kripto_record.finish_date.date()
@@ -159,22 +139,87 @@ class DashboardPage:
                             else kripto_record.finish_date
                         )
                         days_left = (finish_date - datetime.now().date()).days
-                        finish_date_color = ft.Colors.RED if days_left <= 20 else ft.Colors.WHITE
+                        kripto_data.append(f"{finish_date} ({days_left} дней осталось)")
 
-                        kripto_texts.extend([
-                            ft.Text(f"Дата окончания: {finish_date}", color=finish_date_color),
-                            ft.Divider()
-                        ])
-                    self.employee_info.controls.append(ft.Column(controls=kripto_texts))
+                kripto_info = "\n".join(kripto_data) if kripto_data else "Нет данных"
 
-            # Обновляем элементы управления пагинацией
+                # Добавление информации в таблицу
+                self.employee_info.controls.append(
+                    ft.DataTable(
+                        columns=[
+                            ft.DataColumn(ft.Text("Имя", color=ft.Colors.WHITE, size=18)),
+                            ft.DataColumn(ft.Text("Дата окончания ЭЦП", color=ft.Colors.WHITE, size=18)),
+                            ft.DataColumn(ft.Text("Дата окончания КриптоПро", color=ft.Colors.WHITE)),
+                        ],
+                        rows=[
+                            ft.DataRow(
+                                cells=[
+                                    ft.DataCell(
+                                        ft.Text(
+                                            employee.full_name,
+                                            color=ft.Colors.WHITE)),
+                                    ft.DataCell(ft.Text(
+                                        ecp_info,
+                                        color=ft.Colors.GREEN if "дней осталось" in ecp_info else ft.Colors.RED,
+                                        size=15
+                                    )),
+                                    ft.DataCell(ft.Text(
+                                        kripto_info,
+                                        color=ft.Colors.GREEN if "дней осталось" in kripto_info else ft.Colors.RED,
+                                        size=15
+                                    )),
+                                ],
+                                on_long_press=lambda e: self.show_employee_info(empl_id=employee.id)
+                            )
+                        ],
+                          # Заполнение доступного пространства
+                        data_row_max_height=float("inf"),  # Автоматическая подстройка высоты строки
+                        data_row_min_height=48.0,  # Минимальная высота строки (по умолчанию)
+
+                    )
+                )
+
+                # Кнопки редактирования и удаления
+                self.employee_info.controls.append(
+                    ft.Row(
+                        controls=[
+                            ft.Row(
+                                controls=[
+                                    ft.ElevatedButton(
+                                        "Редактировать",
+                                        color=menuFontColor,
+                                        on_click=lambda e: self.edit_employee(
+                                            employee_id=employee.id, employee_name=employee.full_name
+                                        ),
+                                    ),
+                                    ft.ElevatedButton(
+                                        "Удалить",
+                                        color=ft.Colors.RED,
+                                        on_click=lambda e: self.delete_employee(employee),
+                                    ),
+                                ],
+                                spacing=10,
+                            ),
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    )
+                )
+
+                # Разделитель между сотрудниками
+                self.employee_info.controls.append(ft.Divider(color=ft.Colors.WHITE))
+
+            # Обновление пагинации и страницы
             self.update_pagination_controls()
             self.page.update()
 
         except Exception as ex:
+            import traceback
             self.result_text.value = f"Ошибка при загрузке данных: {str(ex)}"
             self.result_text.color = ft.Colors.RED
+            print(traceback.format_exc())  # Вывод трейсбэка для отладки
             self.page.update()
+
+
 
     def go_to_page(self, page_number):
         """Переход к указанной странице."""
@@ -222,7 +267,7 @@ class DashboardPage:
                 ft.Row(
                     expand=True,
                     controls=[
-                        # Left side
+                        # левая сторона
                         ft.Container(
                             expand=2,
                             content=ft.Column(
@@ -239,6 +284,7 @@ class DashboardPage:
                                 controls=[self.result_text,
                                           ft.Divider(),
                                           self.employee_info,
+                                          ft.Divider(),
                                           self.pagination_controls]
                             ),
                             bgcolor=defaultBgColor

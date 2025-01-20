@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import List, Tuple
 
 from oauthlib.uri_validate import query
-from sqlalchemy import select, insert, func, delete
+from sqlalchemy import select, insert, func, delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
@@ -19,7 +19,7 @@ from models.employess import EmployeesORM
 
 
 def get_all_employees_ecp_kripto():
-    with (session_maker() as session):
+    with session_maker() as session:
         query = (
             select(EmployeesORM).options(
                 joinedload(EmployeesORM.ecp),
@@ -41,16 +41,31 @@ def get_one_with_employees_full_name(full_name=None):
         print(model)
         return model
 
+
+def get_one_employee_with_relation(employee_id: int = None):
+    with session_maker() as session:
+        query = (
+            select(EmployeesORM).
+            options(joinedload(EmployeesORM.ecp),
+                    joinedload(EmployeesORM.kriptos))
+            .where(EmployeesORM.id == employee_id))
+        print(query.compile(compile_kwargs={"literal_binds": True}))
+        result = session.execute(query)
+        model = result.scalars().first()
+        print(model)
+        return model
     # Добавление сотрудника
 
 
 def get_ecp_kriptopro_employee_name(full_name=None):
     with session_maker() as session:
-        query = (select(EmployeesORM).
-        options(joinedload(EmployeesORM.ecp),
+        query = (
+            select(EmployeesORM).
+            options(
+                joinedload(EmployeesORM.ecp),
                 joinedload(EmployeesORM.kriptos)
-                ).where(
-            func.lower(EmployeesORM.full_name).like(f"%{full_name}%")))
+            ).where(
+                EmployeesORM.full_name.like(f"%{full_name}%")))
         print(query.compile(compile_kwargs={"literal_binds": True}))
 
         result = session.execute(query)
@@ -145,9 +160,20 @@ def full_update_employee(
 
 def update_employee(
     employee_id: int,
-    employee_data: EmployeePatch,
+    full_name: str,
+    position: str,
+    com_name: str,
+
 ):
     with session_maker() as session:
-        EmployeesRepository(session).edit(employee_data, exclude_unset=True, id=employee_id)
+        stmt = (update(EmployeesORM)
+        .where(EmployeesORM.id == employee_id)
+        .values(
+            full_name=full_name,
+            position=position,
+            com_name=com_name
+        ))
+        print(stmt.compile(compile_kwargs={"literal_binds": True}))
+        res = session.execute(stmt)
         session.commit()
-        return {"status": "ok"}
+        return res

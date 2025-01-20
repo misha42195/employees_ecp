@@ -17,10 +17,11 @@ class AddEcpPage:
         self.page = page  # основная страница приложения
 
         # Элементы интерфейса
-        self.text_add = ft.Text("Добавление ECP", color=defaultFontColor,
-                                weight=ft.FontWeight.NORMAL,
-                                text_align=ft.TextAlign.LEFT
-                                )
+        self.text_add = ft.Text(
+            "Добавление ECP", color=defaultFontColor,
+            weight=ft.FontWeight.NORMAL,
+            text_align=ft.TextAlign.LEFT
+        )
         self.employee_full_name_input = ft.Container(
             content=ft.TextField(
                 label="Введите ФИО сотрудника",
@@ -261,6 +262,8 @@ class AddEcpPage:
                 self.start_date_input.content.value = ""
                 self.finish_date_input.content.value = ""
 
+                self.page.go("/")
+
             except ValueError as er:
 
                 self.employee_full_name_input.content.value = ""
@@ -293,19 +296,45 @@ class AddEcpPage:
         page.window.min_width = 1000
         page.window.min_height = 600
 
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+                                    icon_size=30,
+                                    overlay_color=hoverBgColor,
+                                    shadow_color=hoverBgColor,
+                                    )
+
+        # Панель сайдбар
+        sidebar_menu = ft.Container(
+            padding=ft.padding.symmetric(0, 13),
+            content=ft.Column(
+                controls=[
+                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
+                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
+                                  on_click=lambda e: self.page.go("/employees")),
+                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                                  on_click=lambda e: self.page.go("/add_employees")),
+                    ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+                                  on_click=lambda e: self.page.go("/add_ecp")),
+                    ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+                                  on_click=lambda e: self.page.go("/add_crypto")),
+                    # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+                    #              on_click=lambda e: self.page.go("/delete_employees")),
+                ]
+            )
+        )
+
         return ft.View(
             "/add",
             controls=[
                 ft.Row(
                     expand=True,
                     controls=[
+                        # левая сторона
                         ft.Container(
                             expand=2,
-                            padding=ft.padding.only(20, top=40, right=10, bottom=40),
                             content=ft.Column(
-                                alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
+
+
                                     ft.TextButton("Домой",
                                                   icon=ft.Icons.HOME,  # Иконка "домой"
                                                   style=ft.ButtonStyle(
@@ -318,6 +347,19 @@ class AddEcpPage:
                                                   ),
                                                   on_click=lambda e: self.page.go("/"),
                                                   ),  # Обработчик клика (переход на главную страницу)
+                                    sidebar_menu,
+                                ]
+                            ),
+                            bgcolor=secondaryBgColor
+
+                        ),
+                        ft.Container(
+                            expand=2,
+                            padding=ft.padding.only(20, top=40, right=10, bottom=40),
+                            content=ft.Column(
+                                alignment=ft.MainAxisAlignment.START,
+                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                controls=[
                                     self.text_add,
                                     self.employee_full_name_input,
                                     self.type_ecp_or_token_input,
@@ -341,8 +383,6 @@ class AddEcpPage:
                         ),
                         ft.Container(
                             expand=4,
-                            image_src="assert/salavat.jpg",
-                            image_fit=ft.ImageFit.COVER,
                         )
                     ]
                 )
