@@ -148,8 +148,8 @@ class DashboardPage:
                     ft.DataTable(
                         columns=[
                             ft.DataColumn(ft.Text("Имя", color=ft.Colors.WHITE, size=18)),
-                            ft.DataColumn(ft.Text("Дата окончания ЭЦП", color=ft.Colors.WHITE, size=18)),
-                            ft.DataColumn(ft.Text("Дата окончания КриптоПро", color=ft.Colors.WHITE)),
+                            ft.DataColumn(ft.Text("Дата окончания эцп", color=ft.Colors.WHITE, size=18)),
+                            ft.DataColumn(ft.Text("Дата окончания криптопро", color=ft.Colors.WHITE)),
                         ],
                         rows=[
                             ft.DataRow(
@@ -251,10 +251,10 @@ class DashboardPage:
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
-                    ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
-                                  on_click=lambda e: self.page.go("/add_ecp")),
-                    ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
-                                  on_click=lambda e: self.page.go("/add_crypto")),
+                    # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+                    #               on_click=lambda e: self.page.go("/add_ecp")),
+                    # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+                    #               on_click=lambda e: self.page.go("/add_crypto")),
                     # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
                     #              on_click=lambda e: self.page.go("/delete_employees")),
                 ]

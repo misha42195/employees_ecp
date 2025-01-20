@@ -1,18 +1,21 @@
-import time
+
+from datetime import datetime
 
 import flet as ft
-from datetime import datetime
+import time
 
 from flet_route import Params, Basket
 
-from crud.employees import get_one_with_employees_full_name
+from crud.employees import get_one_with_employees_full_name, get_one_employees_with_id
 from crud.kriptoproies import create_kriptopro
 from model import Employee, ECP, KriptoPro, add_instance  # Ваши модели и функции
+from schemas.ecpies import EcpReqestAdd, EcpAdd
 from schemas.kriptopro import KriptoproRequestAdd
 from utils.style import *
+from crud.ecpies import create_ecp
 
 
-class AddKriptoproPage:
+class AddKriptoproFindEmpl:
     def __init__(self, page: ft.Page):
         self.page = page  # основная страница приложения
 
@@ -21,18 +24,6 @@ class AddKriptoproPage:
                                 weight=ft.FontWeight.NORMAL,
                                 text_align=ft.TextAlign.LEFT
                                 )
-
-        # Поля ввода для "ECP"
-        self.employee_name_input = ft.Container(
-            content=ft.TextField(
-                label="Введите ФИО сотрудника",
-                bgcolor=secondaryBgColor,
-                border=ft.InputBorder.NONE,
-                filled=True,
-                color=secondaryFontColor,
-            ),
-            border_radius=15,
-        )
 
         self.instal_location_input = ft.Container(
             content=ft.TextField(
@@ -58,7 +49,7 @@ class AddKriptoproPage:
         self.start_date_input = ft.Container(
             content=ft.TextField(
                 label="Введите дату (дд.мм.гггг)",
-                hint_text="Например: 21.12.2024",
+                hint_text="Например: 20.10.2025",
                 bgcolor=secondaryBgColor,
                 border=ft.InputBorder.NONE,
                 filled=True,
@@ -70,7 +61,7 @@ class AddKriptoproPage:
         self.finish_date_input = ft.Container(
             content=ft.TextField(
                 label="Введите дату (дд.мм.гггг)",
-                hint_text="Например: 21.12.2024",
+                hint_text="Например: 20.10.2025",
                 bgcolor=secondaryBgColor,
                 border=ft.InputBorder.NONE,
                 filled=True,
@@ -86,29 +77,40 @@ class AddKriptoproPage:
             color=defaultFontColor,
         )
 
-    result_text = ft.Text("", color=ft.Colors.BLACK)
+        self.result_text = ft.Text("")
+
+    # Диалоговое окно для подтверждения добавления ECP
 
     def submit_form(self, e):
-        full_name = self.employee_name_input.content.value.strip()
+        # full_name = self.employee_name_input.content.value.strip()
         install_location = self.instal_location_input.content.value.strip()
         licens_type = self.licens_type_input.content.value.strip()
         start_date = datetime.strptime(str(self.start_date_input.content.value).strip(), "%d.%m.%Y").date()
         finish_date = datetime.strptime(str(self.finish_date_input.content.value).strip(), "%d.%m.%Y").date()
 
-        # Проверка на заполненность всех полей
-        if (not full_name or not install_location
-            or not licens_type or not start_date
-            or not finish_date):
 
+
+        # Проверка на заполненность всех полей
+        if not (install_location and licens_type and start_date and finish_date):
             self.result_text.value = "Пожалуйста, заполните все поля."
             self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
+
+        # Проверка даты окончания
+        if finish_date <= datetime.today().date():
+            self.result_text.value = "Дата окончания должна быть больше сегодняшней даты."
+            self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
+
+
         else:
             try:
                 # получаем сотрудника из базы данных
-                employee: Employee = get_one_with_employees_full_name(full_name=full_name)
-                if employee is None:
-                    self.result_text.value = "Сотрудник не найден в базе данных.\nВедите ФИО сотрудника. или добавьте сотрудника в базу данных."
-                    self.result_text.color = ft.Colors.RED
+                employee_id = self.page.session.get("employee_id")
+                employee: Employee = get_one_employees_with_id(employee_id=employee_id)
+
 
                 print(f"сотрудник в методе submit_form: ", employee)
                 # напишем функцию для добавления объекта ecp в базу данных
@@ -126,7 +128,7 @@ class AddKriptoproPage:
                 time.sleep(2)
                 self.result_text.value = ""
                 # Обнуляем поля формы
-                self.employee_name_input.content.value = ""
+                # self.employee_name_input.content.value = ""
                 self.instal_location_input.content.value = ""
                 self.licens_type_input.content.value = ""
                 self.start_date_input.content.value = ""
@@ -134,7 +136,7 @@ class AddKriptoproPage:
                 self.page.go("/")
 
             except ValueError as er:
-                self.employee_name_input.content.value = ""
+                # self.employee_name_input.content.value = ""
                 self.instal_location_input.content.value = ""
                 self.licens_type_input.content.value = ""
                 self.start_date_input.content.value = ""
@@ -149,19 +151,24 @@ class AddKriptoproPage:
 
                 self.page.update()
 
+
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Добавление криптопро сотруднику"
+        page.title = "Добавление криптопро"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
         page.window.min_height = 600
-
 
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
                                     icon_size=30,
                                     overlay_color=hoverBgColor,
                                     shadow_color=hoverBgColor,
                                     )
+        # полное имя сотрудник
+        self.employee_full_name = ft.Text(
+                value=self.page.session.get("employee_name"),
+                bgcolor=secondaryBgColor,
+                color=secondaryFontColor)
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
@@ -184,7 +191,7 @@ class AddKriptoproPage:
         )
 
         return ft.View(
-            "/add",
+            "/add_kriptopro_find_empl",
             controls=[
                 ft.Row(
                     expand=True,
@@ -222,12 +229,13 @@ class AddKriptoproPage:
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
                                     self.text_add,
-                                    self.employee_name_input,
+                                    self.employee_full_name, # todo вывести имя которому добавляется эцп
                                     self.instal_location_input,
                                     self.licens_type_input,
                                     self.start_date_input,
                                     self.finish_date_input,
                                     self.result_text,
+
                                     self.employee_save_button
 
                                 ]

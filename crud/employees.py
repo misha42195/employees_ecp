@@ -138,6 +138,14 @@ def get_employees_with_expiring_licenses() -> List[
         return result
 
 
+def get_one_employees_with_id(employee_id:int):
+    with session_maker() as session:
+        query = select(EmployeesORM).where(EmployeesORM.id == employee_id)
+        print(query.compile(compile_kwargs={"literal_binds":True}))
+        result= session.execute(query)
+        result = result.scalars().one()
+        return result
+
 def delete_employee(
     employee_id: int,
 ):

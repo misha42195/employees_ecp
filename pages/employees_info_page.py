@@ -16,7 +16,7 @@ class EmployeesInfoPage:
         self.text_add = ft.Text(
             f"Данные сотрудника",
             color=defaultFontColor,
-            weight=ft.FontWeight.NORMAL,
+            size=18,
             text_align=ft.TextAlign.LEFT
         )
 
@@ -58,16 +58,16 @@ class EmployeesInfoPage:
                 [
                     ft.DataTable(
                         columns=[
-                            ft.DataColumn(ft.Text("Сотрудник", color=ft.Colors.WHITE, size=25), ),
-                            ft.DataColumn(ft.Text("Должность", color=ft.Colors.WHITE, size=25)),
-                            ft.DataColumn(ft.Text("Имя компьютера", color=ft.Colors.WHITE, size=25)),
+                            ft.DataColumn(ft.Text("Сотрудник", color=ft.Colors.BLUE, size=22), ),
+                            ft.DataColumn(ft.Text("Должность", color=ft.Colors.BLUE, size=22)),
+                            ft.DataColumn(ft.Text("Имя компьютера", color=ft.Colors.BLUE, size=22)),
                         ],
                         rows=[
                             ft.DataRow(
                                 cells=[
-                                    ft.DataCell(ft.Text(f"{employee.full_name}", color=ft.Colors.WHITE, size=18), ),
-                                    ft.DataCell(ft.Text(f"{employee.position}", color=ft.Colors.WHITE, size=18)),
-                                    ft.DataCell(ft.Text(f"{employee.com_name}", color=ft.Colors.WHITE, size=18)),
+                                    ft.DataCell(ft.Text(f"{employee.full_name}", color=ft.Colors.WHITE, size=19), ),
+                                    ft.DataCell(ft.Text(f"{employee.position}", color=ft.Colors.WHITE, size=19)),
+                                    ft.DataCell(ft.Text(f"{employee.com_name}", color=ft.Colors.WHITE, size=19)),
                                 ]
                             )
                         ]
@@ -75,7 +75,6 @@ class EmployeesInfoPage:
 
                 ],
             )
-
 
             if employee.ecp:
 
@@ -85,87 +84,97 @@ class EmployeesInfoPage:
                     days_left = (finish_date - datetime.now().date()).days
                     finish_date_color = ft.Colors.RED if days_left <= 20 else defaultFontColor
 
-
-
                     self.employee_info_right.controls.extend([
-                        ft.Text(f"ЭЦП:", color=ft.Colors.BLUE, size=15, weight=ft.FontWeight.BOLD),
+                        ft.Row(controls=[
+                            ft.Text(f"ЭЦП", color=ft.Colors.BLUE, size=17, weight=ft.FontWeight.BOLD),
+
+                        ]),
                         ft.Row(
                             controls=[
-                                ft.Text("Тип:", color=defaultFontColor, size=15, width=150),
+                                ft.Text("Тип", color=defaultFontColor, size=16, width=150),
                                 # Фиксированная ширина для выравнивания
-                                ft.Text(ecp_record.type_ecp, color=defaultFontColor, size=15),
+                                ft.Text(ecp_record.type_ecp, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Статус:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.status_ecp, color=defaultFontColor, size=15),
+                                ft.Text("Статус", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.status_ecp, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Место устан.:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.install_location, color=defaultFontColor, size=15),
+                                ft.Text("Место устан.", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.install_location, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Место хран.:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.storage_location, color=defaultFontColor, size=15),
+                                ft.Text("Место хран.", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.storage_location, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Прим. к СБИС:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.sbis, color=defaultFontColor, size=15),
+                                ft.Text("Прим. к СБИС", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.sbis, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Прим. к ЧЗ:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.chz, color=defaultFontColor, size=15),
+                                ft.Text("Прим. к ЧЗ", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.chz, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Прим. к Диадок:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.diadok, color=defaultFontColor, size=15),
+                                ft.Text("Прим. к Диадок", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.diadok, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Прим. к ФНС:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.fns, color=defaultFontColor, size=15),
+                                ft.Text("Прим. к ФНС", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.fns, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Прим. к отчетности:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.report, color=defaultFontColor, size=15),
+                                ft.Text("Прим. к отчетности", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.report, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Прим. к фед.ресурс:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.fed_resours, color=defaultFontColor, size=15),
+                                ft.Text("Прим. к фед.ресурс", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.fed_resours, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Дата нач.:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.start_date, color=defaultFontColor, size=15),
+                                ft.Text("Дата нач.", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.start_date, color=defaultFontColor, size=16),
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text("Дата оконч.:", color=defaultFontColor, size=15, width=150),
-                                ft.Text(ecp_record.finish_date, color=finish_date_color, size=15),
+                                ft.Text("Дата оконч.", color=defaultFontColor, size=16, width=150),
+                                ft.Text(ecp_record.finish_date, color=finish_date_color, size=16),
+                                ft.ElevatedButton(
+                                    "Удалить",
+                                    color=ft.Colors.RED,
+                                    on_click=lambda e: self.delete_ecp(employee),  # todo добавить
+                                ),
+
                             ]
                         ),
-                        ft.Divider(color=defaultBgColor),
+                        ft.Divider(),
                     ])
 
                 if employee.kriptos:
+                    # Первый разделитель перед всеми элементами
+                    self.employee_info_right.controls.append(ft.Divider(color=defaultBgColor))
+
                     for kriptos_record in employee.kriptos:
                         finish_date = kriptos_record.finish_date.date() if isinstance(kriptos_record.finish_date,
                                                                                       datetime) else kriptos_record.finish_date
@@ -173,36 +182,48 @@ class EmployeesInfoPage:
                         finish_date_color = ft.Colors.RED if days_left <= 20 else defaultFontColor
 
                         self.employee_info_right.controls.extend([
-                            ft.Text("КПР:", color=ft.Colors.BLUE, weight=ft.FontWeight.BOLD, size=15),
+                            ft.Row(controls=[
+                                ft.Text(f"КПР", color=ft.Colors.BLUE, size=17, weight=ft.FontWeight.BOLD),
+
+                            ]),
                             ft.Row(
                                 controls=[
-                                    ft.Text("Место устан.:", color=defaultFontColor, size=15, width=150),
-                                    ft.Text(kriptos_record.install_location, color=defaultFontColor, size=15),
+                                    ft.Text("Место устан.", color=defaultFontColor, size=16, width=150),
+                                    ft.Text(kriptos_record.install_location, color=defaultFontColor, size=16),
                                 ]
                             ),
                             ft.Row(
                                 controls=[
-                                    ft.Text("Тип лиц.:", color=defaultFontColor, size=15, width=150),
-                                    ft.Text(kriptos_record.licens_type, color=defaultFontColor, size=15),
+                                    ft.Text("Тип лиц.", color=defaultFontColor, size=16, width=150),
+                                    ft.Text(kriptos_record.licens_type, color=defaultFontColor, size=16),
                                 ]
                             ),
                             ft.Row(
                                 controls=[
-                                    ft.Text("Дата нач.:", color=defaultFontColor, size=15, width=150),
-                                    ft.Text(kriptos_record.start_date, color=defaultFontColor, size=15),
+                                    ft.Text("Дата нач.", color=defaultFontColor, size=16, width=150),
+                                    ft.Text(str(kriptos_record.start_date), color=defaultFontColor, size=16),
                                 ]
                             ),
                             ft.Row(
                                 controls=[
-                                    ft.Text("Дата оконч.:", color=defaultFontColor, size=15, width=150),
-                                    ft.Text(kriptos_record.finish_date, color=finish_date_color, size=15),
+                                    ft.Text("Дата оконч.", color=defaultFontColor, size=16, width=150),
+                                    ft.Text(str(kriptos_record.finish_date), color=finish_date_color, size=16),
+                                    ft.ElevatedButton(
+                                        "Удалить",
+                                        color=ft.Colors.RED,
+                                        on_click=lambda e: self.delete_ecp(employee),  # todo добавить
+                                    ),
+                                    # Добавление разделителя между каждым объектом
+                                    ft.Divider(color=defaultBgColor),
+
                                 ]
                             ),
-                            ft.Divider(color=defaultBgColor),
+
                         ])
 
-            # Обновляем страницу для отображения новых данных
-            self.page.update()
+                    # Обновляем страницу для отображения новых данных после завершения цикла
+                    self.page.update()
+
 
         except ValueError as er:
             self.result_text.value = str(er)
@@ -249,6 +270,7 @@ class EmployeesInfoPage:
                                             },
                                             shape=ft.RoundedRectangleBorder(radius=8),
                                             padding=ft.padding.all(12),
+                                            alignment=ft.alignment.bottom_left
                                         ),
                                         on_click=lambda e: self.page.go("/"),
                                         tooltip="На главную"
@@ -264,6 +286,7 @@ class EmployeesInfoPage:
                         ),
                         ft.Container(
                             expand=3,
+                            alignment=ft.alignment.bottom_left,
                             content=ft.Column(
                                 controls=[
                                     self.result_text,
@@ -275,4 +298,5 @@ class EmployeesInfoPage:
             ],
             bgcolor=defaultBgColor,
             padding=0,
+
         )

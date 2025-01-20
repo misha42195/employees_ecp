@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 import flet as ft
@@ -5,31 +6,25 @@ import time
 
 from flet_route import Params, Basket
 
-from crud.employees import get_one_with_employees_full_name
+from crud.employees import get_one_with_employees_full_name, get_one_employees_with_id
 from model import Employee, ECP, KriptoPro, add_instance  # Ваши модели и функции
 from schemas.ecpies import EcpReqestAdd, EcpAdd
 from utils.style import *
 from crud.ecpies import create_ecp
 
 
-class AddEcpPage:
+class AddEcpFindEmpl:
     def __init__(self, page: ft.Page):
         self.page = page  # основная страница приложения
 
         # Элементы интерфейса
         self.text_add = ft.Text(
-            "Добавление ECP", color=defaultFontColor,
+            "Добавление эцп сотруднику", color=defaultFontColor,
             weight=ft.FontWeight.NORMAL,
             text_align=ft.TextAlign.LEFT
         )
-        self.employee_full_name_input = ft.Container(
-            content=ft.TextField(
-                label="Введите ФИО сотрудника",
-                bgcolor=secondaryBgColor,
-                border=ft.InputBorder.NONE,
-                filled=True,
-                color=secondaryFontColor),
-            border_radius=15)
+
+
 
         # Поля ввода для "ECP"
         self.type_ecp_or_token_input = ft.Container(
@@ -197,7 +192,7 @@ class AddEcpPage:
 
     def submit_form(self, e):
 
-        employees = self.employee_full_name_input.content.value.strip()
+        # employees = self.page.session.get("employee_name")
         type_ecp_or_token = self.type_ecp_or_token_input.content.value.strip()
         status_ecp = str(self.status_ecp_input.content.value).strip()
         install_location = str(self.install_location_input.content.value).strip()
@@ -211,21 +206,31 @@ class AddEcpPage:
         start_date = datetime.strptime(str(self.start_date_input.content.value).strip(), "%d.%m.%Y").date()
         finish_date = datetime.strptime(str(self.finish_date_input.content.value).strip(), "%d.%m.%Y").date()
 
-        # Проверка на заполненность всех полей
-        if not (employees and type_ecp_or_token and status_ecp
-                and install_location and storage_location and
-                sbis and chz and diadok and fns and report and
-                fed_resours and start_date and finish_date):
+
+            # Проверка на заполненность всех полей
+        if not (type_ecp_or_token and status_ecp and install_location and storage_location and
+                sbis and chz and diadok and fns and report and fed_resours and start_date and finish_date):
             self.result_text.value = "Пожалуйста, заполните все поля."
             self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
+
+        # Проверка даты окончания
+        if finish_date <= datetime.today().date():
+            self.result_text.value = "Дата окончания должна быть больше сегодняшней даты."
+            self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
+
+
         else:
             try:
 
                 # получаем сотрудника из базы данных
-                employee: Employee = get_one_with_employees_full_name(full_name=employees)
-                if employee is None:
-                    self.result_text.value = "Сотрудник не найден в базе данных.\nВедите ФИО сотрудника. или добавьте сотрудника в базу данных."
-                    self.result_text.color = ft.Colors.RED
+                employee_id = self.page.session.get("employee_id")
+                employee: Employee = get_one_employees_with_id(employee_id=employee_id)
+
+
 
                 print(f"сотрудник в методе submit_form: ", employee)
                 # напишем функцию для добавления объекта ecp в базу данных
@@ -248,7 +253,7 @@ class AddEcpPage:
                 time.sleep(2)
                 self.result_text.value = ""
                 # Обнуляем поля формы
-                self.employee_full_name_input.content.value = ""
+                # self.employee_full_name_input.content.value = ""
                 self.type_ecp_or_token_input.content.value = ""
                 self.status_ecp_input.content.value = ""
                 self.install_location_input.content.value = ""
@@ -266,7 +271,7 @@ class AddEcpPage:
 
             except ValueError as er:
 
-                self.employee_full_name_input.content.value = ""
+                # self.employee_full_name_input.content.value = ""
                 self.type_ecp_or_token_input.content.value = ""
                 self.status_ecp_input.content.value = "",
                 self.install_location_input.content.value = "",
@@ -301,6 +306,11 @@ class AddEcpPage:
                                     overlay_color=hoverBgColor,
                                     shadow_color=hoverBgColor,
                                     )
+        # полное имя сотрудник
+        self.employee_full_name = ft.Text(
+                value=self.page.session.get("employee_name"),
+                bgcolor=secondaryBgColor,
+                color=secondaryFontColor)
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
@@ -323,7 +333,7 @@ class AddEcpPage:
         )
 
         return ft.View(
-            "/add",
+            "/add_ecp_find_empl",
             controls=[
                 ft.Row(
                     expand=True,
@@ -361,7 +371,7 @@ class AddEcpPage:
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
                                     self.text_add,
-                                    self.employee_full_name_input,
+                                    self.employee_full_name, # todo вывести имя которому добавляется эцп
                                     self.type_ecp_or_token_input,
                                     self.status_ecp_input,
                                     self.install_location_input,
