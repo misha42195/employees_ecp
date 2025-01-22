@@ -215,6 +215,7 @@ class AddEcpFindEmpl:
             self.page.update()
             return
 
+
         # Проверка даты окончания
         if finish_date <= datetime.today().date():
             self.result_text.value = "Дата окончания должна быть больше сегодняшней даты."
@@ -295,22 +296,28 @@ class AddEcpFindEmpl:
         self.page.update()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Добавление сотрудников"
+        page.title = "Добавление эцп"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
         page.window.min_height = 600
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=30,
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
-                                    )
+
         # полное имя сотрудник
         self.employee_full_name = ft.Text(
                 value=self.page.session.get("employee_name"),
                 bgcolor=secondaryBgColor,
                 color=secondaryFontColor)
+
+
+
+
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+                                    icon_size=20,
+                                    text_style=ft.TextStyle(size=16),
+                                    overlay_color=hoverBgColor,
+                                    shadow_color=hoverBgColor,
+                                    )
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
@@ -318,9 +325,9 @@ class AddEcpFindEmpl:
             content=ft.Column(
                 controls=[
                     ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
+                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
-                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                    ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
                     #               on_click=lambda e: self.page.go("/add_ecp")),

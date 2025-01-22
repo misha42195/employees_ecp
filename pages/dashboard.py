@@ -20,7 +20,7 @@ class DashboardPage:
         self.result_text = ft.Text("", color=ft.Colors.WHITE)
         self.employee_info = ft.ListView(expand=True)
         self.current_page = 1
-        self.page_size = 1
+        self.page_size = 2
         self.total_pages = 1
         self.result_text = ft.Text()
         self.load_employees()
@@ -78,7 +78,6 @@ class DashboardPage:
 
     def show_employee_info(self, empl_id: int):
         self.page.session.set("empl_id", empl_id)
-        print(f"dashboard, {empl_id}"),
 
         self.page.go(f"/employees_info")
 
@@ -88,9 +87,6 @@ class DashboardPage:
         return ft.DataCell(
             ft.Text(f"{title}: дата окончания: {finish_date}", color=finish_date_color, expand=1),
         )
-
-
-
 
     def load_employees(self):
         """Загрузка данных сотрудников для текущей страницы."""
@@ -111,6 +107,16 @@ class DashboardPage:
             page_employees = employees[start_index:end_index]
 
             self.employee_info.controls.clear()
+
+            # Заголовки таблицы
+            data_table = ft.DataTable(
+                columns=[
+                    ft.DataColumn(ft.Text("Сотрудник", color=ft.Colors.WHITE, size=22)),
+                    ft.DataColumn(ft.Text("Дата окончания эцп", color=ft.Colors.WHITE, size=22)),
+                    ft.DataColumn(ft.Text("Дата окончания кпр", color=ft.Colors.WHITE, size=22)),
+                ],
+                rows=[],
+            )
 
             for employee_tuple in page_employees:
                 employee = employee_tuple[0]
@@ -143,70 +149,25 @@ class DashboardPage:
 
                 kripto_info = "\n".join(kripto_data) if kripto_data else "Нет данных"
 
-                # Добавление информации в таблицу
-                self.employee_info.controls.append(
-                    ft.DataTable(
-                        columns=[
-                            ft.DataColumn(ft.Text("Имя", color=ft.Colors.WHITE, size=18)),
-                            ft.DataColumn(ft.Text("Дата окончания эцп", color=ft.Colors.WHITE, size=18)),
-                            ft.DataColumn(ft.Text("Дата окончания криптопро", color=ft.Colors.WHITE)),
+                # Добавление строки с данными сотрудника
+                data_table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(ft.Text(employee.full_name, color=ft.Colors.WHITE, size=18)),
+                            ft.DataCell(ft.Text(ecp_info,
+                                                color=ft.Colors.GREEN if "дней осталось" in ecp_info else ft.Colors.RED,
+                                                size=18)),
+                            ft.DataCell(ft.Text(kripto_info,
+                                                color=ft.Colors.GREEN if "дней осталось" in kripto_info else ft.Colors.RED,
+                                                size=18)),
                         ],
-                        rows=[
-                            ft.DataRow(
-                                cells=[
-                                    ft.DataCell(
-                                        ft.Text(
-                                            employee.full_name,
-                                            color=ft.Colors.WHITE)),
-                                    ft.DataCell(ft.Text(
-                                        ecp_info,
-                                        color=ft.Colors.GREEN if "дней осталось" in ecp_info else ft.Colors.RED,
-                                        size=15
-                                    )),
-                                    ft.DataCell(ft.Text(
-                                        kripto_info,
-                                        color=ft.Colors.GREEN if "дней осталось" in kripto_info else ft.Colors.RED,
-                                        size=15
-                                    )),
-                                ],
-                                on_long_press=lambda e: self.show_employee_info(empl_id=employee.id)
-                            )
-                        ],
-                          # Заполнение доступного пространства
-                        data_row_max_height=float("inf"),  # Автоматическая подстройка высоты строки
-                        data_row_min_height=48.0,  # Минимальная высота строки (по умолчанию)
-
+                        # Обработчик нажатия
+                        on_long_press=lambda e, emp_id=employee.id: self.show_employee_info(emp_id),
                     )
                 )
 
-                # Кнопки редактирования и удаления
-                self.employee_info.controls.append(
-                    ft.Row(
-                        controls=[
-                            ft.Row(
-                                controls=[
-                                    ft.ElevatedButton(
-                                        "Редактировать",
-                                        color=menuFontColor,
-                                        on_click=lambda e: self.edit_employee(
-                                            employee_id=employee.id, employee_name=employee.full_name
-                                        ),
-                                    ),
-                                    ft.ElevatedButton(
-                                        "Удалить",
-                                        color=ft.Colors.RED,
-                                        on_click=lambda e: self.delete_employee(employee),
-                                    ),
-                                ],
-                                spacing=10,
-                            ),
-                        ],
-                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                    )
-                )
-
-                # Разделитель между сотрудниками
-                self.employee_info.controls.append(ft.Divider(color=ft.Colors.WHITE))
+            # Добавление таблицы в контейнер
+            self.employee_info.controls.append(data_table)
 
             # Обновление пагинации и страницы
             self.update_pagination_controls()
@@ -219,8 +180,6 @@ class DashboardPage:
             print(traceback.format_exc())  # Вывод трейсбэка для отладки
             self.page.update()
 
-
-
     def go_to_page(self, page_number):
         """Переход к указанной странице."""
         if 1 <= page_number <= self.total_pages:
@@ -228,7 +187,7 @@ class DashboardPage:
             self.load_employees()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Панель управления"
+        page.title = "Домашняя страница"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
@@ -236,7 +195,8 @@ class DashboardPage:
         page.scroll = "adaptive"
 
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=30,
+                                    icon_size=20,
+                                    text_style=ft.TextStyle(size=16),
                                     overlay_color=hoverBgColor,
                                     shadow_color=hoverBgColor,
                                     )
@@ -247,9 +207,9 @@ class DashboardPage:
             content=ft.Column(
                 controls=[
                     ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
+                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
-                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                    ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
                     #               on_click=lambda e: self.page.go("/add_ecp")),
@@ -266,8 +226,9 @@ class DashboardPage:
             controls=[
                 ft.Row(
                     expand=True,
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        # левая сторона
+                        # Левая сторона
                         ft.Container(
                             expand=2,
                             content=ft.Column(
@@ -275,19 +236,25 @@ class DashboardPage:
                                     sidebar_menu
                                 ]
                             ),
-                            bgcolor=secondaryBgColor
+                            bgcolor=secondaryBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),  # Внутренние отступы
                         ),
-                        # Container with employee data
+                        # Контейнер с данными сотрудников
                         ft.Container(
                             expand=4,
                             content=ft.Column(
-                                controls=[self.result_text,
-                                          ft.Divider(),
-                                          self.employee_info,
-                                          ft.Divider(),
-                                          self.pagination_controls]
+                                controls=[
+                                    self.result_text,
+                                    ft.Divider(),
+                                    self.employee_info,
+                                    ft.Divider(),
+                                    self.pagination_controls
+                                ]
                             ),
-                            bgcolor=defaultBgColor
+                            bgcolor=defaultBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),  # Внутренние отступы
                         )
                     ]
                 )

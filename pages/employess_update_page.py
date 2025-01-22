@@ -164,8 +164,11 @@ class UpdateEmployeesPage:
             color=defaultFontColor,
         )
 
+
+
+
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=30,
+                                    icon_size=20,
                                     overlay_color=hoverBgColor,
                                     shadow_color=hoverBgColor,
                                     )
@@ -175,9 +178,9 @@ class UpdateEmployeesPage:
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
-                                  on_click=lambda e: self.page.go("/employees")),
+                    ft.Text("МЕНЮ", color=menuFontColor, size=20),
+                    # ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+                    #               on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
@@ -194,6 +197,7 @@ class UpdateEmployeesPage:
             "/update_employees",
             controls=[
                 ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     expand=True,
                     controls=[
 

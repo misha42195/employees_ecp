@@ -99,21 +99,17 @@ def update_ecp(
         session.commit()
         return {"status": "ok"}
 
-
-def delete_ecp(
-    employees_id: int,
-    ecp_id: int
-):
+def delete_ecp(ecp_id: int):
     with session_maker() as session:
         ecp_delete_stmt = (delete(EcpORM).
-                           filter_by(id=ecp_id, employees_id=employees_id)
+                           filter_by(id=ecp_id)
                            .returning(EcpORM))
         result =  session.execute(ecp_delete_stmt)
 
         ecp = result.scalars().one()
         session.commit()
 
-        return {"status":"ok","ecp":ecp}
+        return ecp
 
 
 

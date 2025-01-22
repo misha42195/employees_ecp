@@ -290,11 +290,14 @@ class AddEcpPage:
         self.page.update()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Добавление сотрудников"
+        page.title = "Добавление сотрудника"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
         page.window.min_height = 600
+
+
+
 
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
                                     icon_size=30,

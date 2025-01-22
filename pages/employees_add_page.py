@@ -163,8 +163,11 @@ class AddEmployeesPage:
             color=defaultFontColor,
         )
 
+
+
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=30,
+                                    icon_size=20,
+                                    text_style=ft.TextStyle(size=16),
                                     overlay_color=hoverBgColor,
                                     shadow_color=hoverBgColor,
                                     )
@@ -175,10 +178,10 @@ class AddEmployeesPage:
             content=ft.Column(
                 controls=[
                     ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
+                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
-                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
-                                  on_click=lambda e: self.page.go("/add_employees")),
+                    # ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                    #               on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
                     #               on_click=lambda e: self.page.go("/add_ecp")),
                     # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
@@ -194,6 +197,7 @@ class AddEmployeesPage:
             controls=[
                 ft.Row(
                     expand=True,
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         # левая сторона
                         ft.Container(
@@ -217,15 +221,17 @@ class AddEmployeesPage:
                                     sidebar_menu,
                                 ]
                             ),
-                            bgcolor=secondaryBgColor
+                            bgcolor=secondaryBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
 
                         ),
                         ft.Container(
-                            expand=2,
-                            padding=ft.padding.only(20, top=40, right=10, bottom=40),
+                            expand=4,
+                            #padding=ft.padding.only(20, top=40, right=10, bottom=40),
                             content=ft.Column(
-                                alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                # alignment=ft.MainAxisAlignment.START,
+                                # horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[  # Обработчик клика (переход на главную страницу)
                                     self.text_add,
                                     self.employee_full_name_input,
@@ -233,13 +239,11 @@ class AddEmployeesPage:
                                     self.employee_com_name_input,
                                     self.result_text,
 
-                                    self.employee_save_button,
-
-                                ]
-                            )
-                        ),
-                        ft.Container(
-                            expand=4,
+                                    self.employee_save_button,]
+                            ),
+                            bgcolor=defaultBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
 
                         )
                     ]

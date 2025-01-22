@@ -72,20 +72,19 @@ def update_kriptopro(
         return {"status": "ok"}
 
 
-def delete_kriptopro(
-    employees_id: int,
-    kriptopro_id: int
-):
+def delete_kpr(kpr_id: int):
     with session_maker() as session:
-        ecp_delete_stmt = (delete(KriptosORM).
-                           filter_by(id=kriptopro_id, employees_id=employees_id)
+        kpr_delete_stmt = (delete(KriptosORM).
+                           filter_by(id=kpr_id)
                            .returning(KriptosORM))
-        result = session.execute(ecp_delete_stmt)
+        result =  session.execute(kpr_delete_stmt)
 
-        kripto = result.scalars().one()
+        kpr = result.scalars().one()
         session.commit()
 
-        return {"status": "ok", "ecp": kripto}
+        return kpr
+
+
 
 
 # функция для получения всех криптопро с истекающими лицензиями
