@@ -15,18 +15,24 @@ class AddEmployeesPage:
         self.page = page  # основная страница приложения
 
         # Элементы интерфейса
-        self.text_add = ft.Text("Добавление сотрудника", color=defaultFontColor,
-                                weight=ft.FontWeight.NORMAL,
-                                text_align=ft.TextAlign.LEFT)
+        self.text_add = ft.Text(
+            "Добавление сотрудника",
+            size=18,
+            color=defaultFontColor,
+            weight=ft.FontWeight.NORMAL,
+            text_align=ft.TextAlign.LEFT
+        )
 
         # Поля ввода для "Сотрудника"
         self.employee_full_name_input = ft.Container(
             content=ft.TextField(
+
                 label="Введите ФИО сотрудника",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                # color=secondaryFontColor,
+                width=500,
             ),
             border_radius=15,
         )
@@ -34,10 +40,11 @@ class AddEmployeesPage:
         self.employee_position_input = ft.Container(
             content=ft.TextField(
                 label="Введите должность",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                #color=secondaryFontColor,
+                width=500,
             ),
             border_radius=15,
         )
@@ -45,23 +52,24 @@ class AddEmployeesPage:
         self.employee_com_name_input = ft.Container(
             content=ft.TextField(
                 label="Введите имя компьютера",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                # color=secondaryFontColor,
+                width=500,
             ),
             border_radius=15,
         )
 
         # Создаем кнопку в методе view, где доступен self
-        self.employee_save_button = ft.ElevatedButton(
-            text="Сохранить сотрудника",
+        self.employee_save_button = ft.FilledButton(
+            "Сохранить сотрудника",
+            icon="save",
             on_click=self.submit_form,  # Указываем правильный обработчик
-            bgcolor=defaultBgColor,
-            color=defaultFontColor,
+            bgcolor=ft.Colors.BLUE_300,
         )
 
-    result_text = ft.Text("", color=ft.Colors.BLACK)
+    result_text = ft.Text("")
 
     def submit_form(self, e):
         """
@@ -83,6 +91,7 @@ class AddEmployeesPage:
                 self.result_text.value = f"Сотрудник '{full_name}' успешно добавлен!"
                 self.page.update()
                 time.sleep(2)
+                self.page.go("/")
 
                 self.result_text.value = ""
                 # Обнуляем поля формы
@@ -155,21 +164,14 @@ class AddEmployeesPage:
         page.window.min_width = 1000
         page.window.min_height = 600
 
-        # Создаем кнопку в методе view, где доступен self
-        self.employee_save_button = ft.ElevatedButton(
-            text="Сохранить сотрудника",
-            on_click=self.submit_form,  # Указываем правильный обработчик
-            bgcolor=defaultBgColor,
-            color=defaultFontColor,
-        )
 
 
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
                                     icon_size=20,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=ft.Colors.GREY_300,
+                                    shadow_color=ft.Colors.GREY_300,
                                     )
 
         # Панель сайдбар

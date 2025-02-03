@@ -5,7 +5,7 @@ import flet as ft
 from flet_route import Params, Basket
 
 from crud.ecpies import delete_ecp
-from crud.employees import get_one_employee_with_relation  # Импорт методов работы с базой данных
+from crud.employees import get_one_employee_with_relation, delete_employee  # Импорт методов работы с базой данных
 from crud.kriptoproies import delete_kpr
 from utils.style import *  # Стили и настройки
 
@@ -47,20 +47,12 @@ class EmployeesInfoPage:
             padding=ft.Padding(left=0, top=0, right=0, bottom=0),
         )
 
-        # self.employee_info_right = ft.ListView(
-        #     controls=[],
-        #     height=1000,
-        #     expand=True,
-        #     divider_thickness=True,
-        #     padding=ft.Padding(left=0, top=0, right=0, bottom=0),
-        # )
-
         self.employee_info_right = ft.ListView(
             controls=[],
             expand=True,
             divider_thickness=True,
             padding=ft.Padding(left=0, top=0, right=0, bottom=0),
-            auto_scroll=True,  # Автопрокрутка
+            # auto_scroll=True,  # Автопрокрутка
         )
 
         self.result_text = ft.Text("", color=ft.Colors.BLACK)
@@ -133,6 +125,28 @@ class EmployeesInfoPage:
         # Обновляем форму после завершения
         self.submit_form()
 
+    # Функция удаления сотрудника
+    def delete_employee(self, emp):
+
+        try:
+            # Переменная для хранения найденного сотрудника
+            employee = emp
+            employee_id = employee.id
+            # Удаляем сотрудника
+            delete_employee(employee_id=employee_id)
+            self.result_text.value = f"Сотрудник {employee.full_name} успешно удалён."
+            self.result_text.color = ft.Colors.GREEN
+            self.page.update()
+            time.sleep(2)
+            self.result_text.value = ""
+            self.page.go("/")
+
+        except Exception as ex:
+            self.result_text.value = f"Ошибка при удалении: {str(ex)}"
+            self.result_text.color = ft.Colors.RED
+            self.page.update()
+        self.submit_form()
+
     def submit_form(self):
         self.employee_info_left.controls.clear()
         self.employee_info_right.controls.clear()
@@ -161,30 +175,10 @@ class EmployeesInfoPage:
             # Заполняем левую панель с основной информацией
             self.employee_info_left.controls.extend(
                 [
-                    # ft.DataTable(
-                    #     columns=[
-                    #         ft.DataColumn(
-                    #             ft.Text("Сотрудник", color=ft.Colors.BLUE, size=20, weight=ft.FontWeight.BOLD)),
-                    #         ft.DataColumn(
-                    #             ft.Text("Должность", color=ft.Colors.BLUE, size=20, weight=ft.FontWeight.BOLD)),
-                    #         ft.DataColumn(
-                    #             ft.Text("Имя компьютера", color=ft.Colors.BLUE, size=20, weight=ft.FontWeight.BOLD)),
-                    #     ],
-                    #
-                    #     rows=[
-                    #         ft.DataRow(
-                    #             cells=[
-                    #                 ft.DataCell(ft.Text(f"{employee.full_name}", color=ft.Colors.WHITE, size=18)),
-                    #                 ft.DataCell(ft.Text(f"{employee.position}", color=ft.Colors.WHITE, size=18)),
-                    #                 ft.DataCell(ft.Text(f"{employee.com_name}", color=ft.Colors.WHITE, size=18)),
-                    #             ]
-                    #         ),
-                    #     ],
-                    # ),
 
                     ft.Row(
                         controls=[
-                            ft.Text(f"Сотрудник:              ", color=ft.Colors.BLUE, size=22, ),
+                            ft.Text(f"Сотрудник:              ", color=ft.Colors.BLUE_ACCENT_700, size=22, ),
                             ft.Text(f"{employee.full_name}", color=defaultFontColor, size=18)
                         ],
                         alignment=ft.MainAxisAlignment.START,
@@ -206,12 +200,21 @@ class EmployeesInfoPage:
                         alignment=ft.MainAxisAlignment.START,
                         spacing=10
                     ),
+                    ft.Row(alignment=ft.MainAxisAlignment.START, controls=[
+                        ft.IconButton(
+                            icon=ft.Icons.DELETE_FOREVER_ROUNDED,
+                            icon_color="pink600",
+                            icon_size=30,
+                            tooltip="удалить сотрудника",
+                            on_click=lambda e: self.delete_employee(emp=employee),
+                        ),
+                    ]),
                     ft.Row(
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
                             ft.FilledButton(
                                 "Добавить эцп",
-                                icon="add",
+                                # icon="add",
                                 bgcolor=ft.Colors.BLUE_300,
                                 tooltip="Добавить новый эцп",
                                 on_click=lambda e: self.add_ecp_page(
@@ -226,22 +229,17 @@ class EmployeesInfoPage:
                             # self.add_kpr_button
                             ft.FilledButton(
                                 "Добавить кпр",
-                                icon="add",
+                                # icon="add",
                                 bgcolor=ft.Colors.BLUE_300,
                                 tooltip="Добавить новый криптопро",
                                 on_click=lambda e: self.add_kpr_page(
                                     employee_id=employee.id, employee_name=employee.full_name
                                 ),
                             )
-                            # ft.ElevatedButton(
-                            #     text="Добавить криптопро",
-                            #     tooltip="Добавить новый криптопро",
-                            #     bgcolor=ft.Colors.BLUE_100,
-                            #     on_click=lambda e: self.add_kpr_page(
-                            #         employee_id=employee.id, employee_name=employee.full_name
-                            #     ),
-                            # ),
                         ]),
+                    ft.Row(controls=[
+                        ft.Text("")
+                    ]),
 
                     ft.Divider(color=defaultBgColor),
                 ])
@@ -259,9 +257,12 @@ class EmployeesInfoPage:
                     finish_date_color = ft.Colors.RED if days_left <= 20 else defaultFontColor
 
                     self.employee_info_right.controls.extend([
+                        ft.Row(controls=[
+                            ft.Text("ЭЦП:", color=ft.Colors.BLUE_ACCENT_700, size=18)
+                        ]),
                         ft.Row(
                             controls=[
-                                ft.Text(f"ЭЦП:                                  ", color=ft.Colors.BLUE, size=18, ),
+                                ft.Text(f"Тип ЭЦП                           ", color=ft.Colors.BLUE, size=18, ),
                                 ft.Text(f"{ecp_record.type_ecp}", color=defaultFontColor, size=18)
                             ],
                             alignment=ft.MainAxisAlignment.START,
@@ -361,7 +362,7 @@ class EmployeesInfoPage:
                                 ft.IconButton(
                                     icon=ft.Icons.DELETE_FOREVER_ROUNDED,
                                     icon_color="pink600",
-                                    icon_size=40,
+                                    icon_size=30,
                                     tooltip="Удалить ЭЦП",
                                     on_click=lambda e: self.delete_ecp_(ecp_record.id)
                                 ),
@@ -386,7 +387,11 @@ class EmployeesInfoPage:
                     self.employee_info_right.controls.extend([
                         ft.Row(
                             controls=[
-                                ft.Text(f"Криптопро:                    ", color=ft.Colors.BLUE, size=18, ),
+                                ft.Text("Кпр-csp", color=ft.Colors.BLUE_ACCENT_700, size=18)
+                            ]),
+                        ft.Row(
+                            controls=[
+                                ft.Text(f"Место установки:         ", color=ft.Colors.BLUE, size=18, ),
                                 ft.Text(f"{kriptos_record.install_location}", color=defaultFontColor, size=18)
                             ],
                             alignment=ft.MainAxisAlignment.START,
@@ -394,11 +399,17 @@ class EmployeesInfoPage:
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Тип лицензии:               ", color=ft.Colors.BLUE, size=18, ),
+                                ft.Text(f"Имя комп:                        ", color=ft.Colors.BLUE, size=18, ),
                                 ft.Text(f"{kriptos_record.licens_type}", color=defaultFontColor, size=18)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
+                        ),
+                        ft.Row(
+                            controls=[
+                                ft.Text(f"Версия лицензии:        ",color=ft.Colors.BLUE,size=18),
+                                ft.Text(f"{kriptos_record.version}", color=defaultFontColor, size=18)
+                            ]
                         ),
                         ft.Row(
                             controls=[
@@ -410,7 +421,7 @@ class EmployeesInfoPage:
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Дата окончания:          ", color=ft.Colors.BLUE, size=18, ),
+                                ft.Text(f"Дата окончания:           ", color=ft.Colors.BLUE, size=18, ),
                                 ft.Text(f"{kriptos_record.finish_date}", color=finish_date_color, size=18)
                             ],
                             alignment=ft.MainAxisAlignment.START,
@@ -421,7 +432,7 @@ class EmployeesInfoPage:
                                 ft.IconButton(
                                     icon=ft.Icons.DELETE_FOREVER_ROUNDED,
                                     icon_color="pink600",
-                                    icon_size=40,
+                                    icon_size=30,
                                     tooltip="Удалить криптопро",
                                     on_click=lambda e: self.delete_kpr_(kriptos_record.id)
                                 ),
@@ -452,11 +463,11 @@ class EmployeesInfoPage:
 
         self.submit_form()
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=20,
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+                                    icon_size=30,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=ft.Colors.GREY_300,
+                                    shadow_color=ft.Colors.GREY_300,
                                     )
 
         # Панель сайдбар

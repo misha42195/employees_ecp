@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 import flet as ft
@@ -6,9 +5,9 @@ import time
 
 from flet_route import Params, Basket
 
-from crud.employees import get_one_with_employees_full_name, get_one_employees_with_id
-from model import Employee, ECP, KriptoPro, add_instance  # Ваши модели и функции
-from schemas.ecpies import EcpReqestAdd, EcpAdd
+from crud.employees import  get_one_employees_with_id
+from model import Employee  # Ваши модели и функции
+from schemas.ecpies import EcpReqestAdd
 from utils.style import *
 from crud.ecpies import create_ecp
 
@@ -19,21 +18,21 @@ class AddEcpFindEmpl:
 
         # Элементы интерфейса
         self.text_add = ft.Text(
-            "Добавление эцп сотруднику", color=defaultFontColor,
+            "Добавление эцп сотруднику",
+            size=18,
+            color=defaultFontColor,
             weight=ft.FontWeight.NORMAL,
             text_align=ft.TextAlign.LEFT
         )
-
-
 
         # Поля ввода для "ECP"
         self.type_ecp_or_token_input = ft.Container(
             ft.Dropdown(
                 label="Выберите из списка токен или реестр",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Токен", text="Токен"),
                     ft.dropdown.Option(key="Реестр", text="Реестр"),
@@ -43,10 +42,10 @@ class AddEcpFindEmpl:
         self.status_ecp_input = ft.Container(
             ft.Dropdown(
                 label="Выберите из списка работает или отозван",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Работает", text="Работает"),
                     ft.dropdown.Option(key="Отозван", text="Отозван"),
@@ -56,30 +55,32 @@ class AddEcpFindEmpl:
         self.install_location_input = ft.Container(
             content=ft.TextField(
                 label="Введите место установки",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor),
+                width=500),
+
             border_radius=15)
 
         # где хранится
         self.storage_location_input = ft.Container(
             content=ft.TextField(
                 label="Введите место хранения",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor),
+                width=500),
+                #color=secondaryFontColor),
             border_radius=15)
 
         # применим к сбис (да/нет) выпадающий список
         self.sbis_input = ft.Container(
             ft.Dropdown(
                 label="Применим к СБИС",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Да", text="Да"),
                     ft.dropdown.Option(key="Нет", text="Нет"),
@@ -90,10 +91,10 @@ class AddEcpFindEmpl:
         self.cz_input = ft.Container(
             ft.Dropdown(
                 label="Применим к ЧЗ",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Да", text="Да"),
                     ft.dropdown.Option(key="Нет", text="Нет"),
@@ -104,10 +105,10 @@ class AddEcpFindEmpl:
         self.diadok_input = ft.Container(
             ft.Dropdown(
                 label="Применим к Диадок",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Да", text="Да"),
                     ft.dropdown.Option(key="Нет", text="Нет"),
@@ -118,10 +119,10 @@ class AddEcpFindEmpl:
         self.fns_input = ft.Container(
             ft.Dropdown(
                 label="Применим к ФНС",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Да", text="Да"),
                     ft.dropdown.Option(key="Нет", text="Нет"),
@@ -132,10 +133,10 @@ class AddEcpFindEmpl:
         self.report_input = ft.Container(
             ft.Dropdown(
                 label="Применим к отчетности",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Да", text="Да"),
                     ft.dropdown.Option(key="Нет", text="Нет"),
@@ -146,24 +147,26 @@ class AddEcpFindEmpl:
         self.fed_resours_input = ft.Container(
             ft.Dropdown(
                 label="Применим к Фед.Ресурсу",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
                 options=[
                     ft.dropdown.Option(key="Да", text="Да"),
                     ft.dropdown.Option(key="Нет", text="Нет"),
                 ],
-            ), border_radius=15)
+            ),
+            border_radius=15
+        )
 
         self.start_date_input = ft.Container(
             content=ft.TextField(
                 label="Введите дату (дд.мм.гггг)",
                 hint_text="Например: 21.12.2024",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor
+                width=500,
             ),
             border_radius=15)
         # дата завершения лицензии
@@ -171,10 +174,10 @@ class AddEcpFindEmpl:
             content=ft.TextField(
                 label="Введите дату (дд.мм.гггг)",
                 hint_text="Например: 21.12.2024",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor
+                width=500,
             ),
             border_radius=15
         )
@@ -182,8 +185,8 @@ class AddEcpFindEmpl:
         self.employee_save_button = ft.ElevatedButton(
             text="Сохранить сотрудника",
             on_click=self.submit_form,
-            bgcolor=defaultBgColor,
-            color=defaultFontColor,
+            bgcolor=ft.Colors.BLUE_100,
+            # color=defaultFontColor,
         )
 
         self.result_text = ft.Text("")
@@ -206,15 +209,13 @@ class AddEcpFindEmpl:
         start_date = datetime.strptime(str(self.start_date_input.content.value).strip(), "%d.%m.%Y").date()
         finish_date = datetime.strptime(str(self.finish_date_input.content.value).strip(), "%d.%m.%Y").date()
 
-
-            # Проверка на заполненность всех полей
+        # Проверка на заполненность всех полей
         if not (type_ecp_or_token and status_ecp and install_location and storage_location and
                 sbis and chz and diadok and fns and report and fed_resours and start_date and finish_date):
             self.result_text.value = "Пожалуйста, заполните все поля."
             self.result_text.color = ft.Colors.RED
             self.page.update()
             return
-
 
         # Проверка даты окончания
         if finish_date <= datetime.today().date():
@@ -231,8 +232,6 @@ class AddEcpFindEmpl:
                 employee_id = self.page.session.get("employee_id")
                 employee: Employee = get_one_employees_with_id(employee_id=employee_id)
 
-
-
                 print(f"сотрудник в методе submit_form: ", employee)
                 # напишем функцию для добавления объекта ecp в базу данных
                 create_ecp(employees_id=employee.id, ecp_data=EcpReqestAdd(
@@ -248,7 +247,7 @@ class AddEcpFindEmpl:
                     fed_resours=fed_resours,
                     start_date=start_date,
                     finish_date=finish_date), )
-                self.result_text.value = f"Сотруднику {employee.full_name} добавлен ECP."
+                self.result_text.value = f"сотруднику {employee.full_name} добавлен эцп."
                 self.result_text.color = ft.Colors.GREEN
                 self.page.update()
                 time.sleep(2)
@@ -302,21 +301,17 @@ class AddEcpFindEmpl:
         page.window.min_width = 1000
         page.window.min_height = 600
 
-
         # полное имя сотрудник
         self.employee_full_name = ft.Text(
-                value=self.page.session.get("employee_name"),
-                bgcolor=secondaryBgColor,
-                color=secondaryFontColor)
+            value=self.page.session.get("employee_name"),
+            bgcolor=secondaryBgColor,
+            color=secondaryFontColor)
 
-
-
-
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
                                     icon_size=20,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=ft.Colors.GREY_300,
+                                    shadow_color=ft.Colors.GREY_300,
                                     )
 
         # Панель сайдбар
@@ -324,7 +319,7 @@ class AddEcpFindEmpl:
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
+                    ft.Text("МЕНЮ", color=ft.Colors.GREY_100, size=12),
                     ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
@@ -344,6 +339,7 @@ class AddEcpFindEmpl:
             controls=[
                 ft.Row(
                     expand=True,
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         # левая сторона
                         ft.Container(
@@ -351,13 +347,12 @@ class AddEcpFindEmpl:
                             content=ft.Column(
                                 controls=[
 
-
                                     ft.TextButton("Домой",
                                                   icon=ft.Icons.HOME,  # Иконка "домой"
                                                   style=ft.ButtonStyle(
-                                                      color={ft.ControlState.HOVERED: ft.Colors.BLUE,
+                                                      color={ft.ControlState.HOVERED: ft.Colors.GREY_100,
                                                              # Цвет при наведении
-                                                             ft.ControlState.DEFAULT: ft.Colors.BLACK},
+                                                             ft.ControlState.DEFAULT: ft.Colors.GREY_100},
                                                       # Цвет по умолчанию
                                                       shape=ft.RoundedRectangleBorder(radius=8),  # Округлённые углы
                                                       padding=ft.padding.all(12),  # Внутренние отступы
@@ -367,18 +362,19 @@ class AddEcpFindEmpl:
                                     sidebar_menu,
                                 ]
                             ),
-                            bgcolor=secondaryBgColor
+                            bgcolor=secondaryBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
 
                         ),
                         ft.Container(
-                            expand=2,
-                            padding=ft.padding.only(20, top=40, right=10, bottom=40),
+                            expand=4,
                             content=ft.Column(
-                                alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                # alignment=ft.MainAxisAlignment.START,
+                                # horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
                                     self.text_add,
-                                    self.employee_full_name, # todo вывести имя которому добавляется эцп
+                                    self.employee_full_name,  # todo вывести имя которому добавляется эцп
                                     self.type_ecp_or_token_input,
                                     self.status_ecp_input,
                                     self.install_location_input,
@@ -396,11 +392,12 @@ class AddEcpFindEmpl:
                                     self.employee_save_button
 
                                 ]
-                            )
-                        ),
-                        ft.Container(
-                            expand=4,
+                            ),
+                            bgcolor=defaultBgColor,
+                            border=ft.border.all(1, "#808080"),
+                            padding=ft.padding.all(10),
                         )
+
                     ]
                 )
             ],

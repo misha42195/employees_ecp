@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 import flet as ft
@@ -20,40 +19,73 @@ class AddKriptoproFindEmpl:
         self.page = page  # основная страница приложения
 
         # Элементы интерфейса
-        self.text_add = ft.Text("Добавление криптопро к сотруднику", color=defaultFontColor,
-                                weight=ft.FontWeight.NORMAL,
-                                text_align=ft.TextAlign.LEFT
-                                )
+        self.text_add = ft.Text(
+            "Добавление криптопро к сотруднику",
+            color=defaultFontColor,
+            size=18,
+            weight=ft.FontWeight.NORMAL,
+            text_align=ft.TextAlign.LEFT
+        )
 
         self.instal_location_input = ft.Container(
             content=ft.TextField(
                 label="Введите место установки",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
             ),
             border_radius=15,
         )
         self.licens_type_input = ft.Container(
             content=ft.TextField(
                 label="Введите имя компьютера",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
+                width=500,
             ),
             border_radius=15,
+        )
+        self.version_input = ft.Container(
+            content=ft.Dropdown(
+                label="Версия криптопро",
+                bgcolor=ft.Colors.GREY_100,
+                border=ft.InputBorder.NONE,
+                filled=None,
+                width=500,
+
+                options=[
+                    ft.dropdown.Option(key="5", text="5"),
+                    ft.dropdown.Option(key="6", text="6"),
+                    ft.dropdown.Option(key="7", text="7"),
+                ],
+            ),
+            border_radius=15
+        )
+        self.license_action = ft.Container(
+            content=ft.Dropdown(
+                label="Срок действия",
+                bgcolor=ft.Colors.GREY_100,
+                border=ft.InputBorder.NONE,
+                filled=None,
+                width=500,
+                options=[
+                    ft.dropdown.Option(key="Срочная"),
+                    ft.dropdown.Option(key=" Бессрочная",on_click=self.change_finishdate_input)
+                ]
+
+            )
         )
 
         self.start_date_input = ft.Container(
             content=ft.TextField(
                 label="Введите дату (дд.мм.гггг)",
                 hint_text="Например: 20.10.2025",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor
+                width=500,
             ),
             border_radius=15)
 
@@ -62,10 +94,10 @@ class AddKriptoproFindEmpl:
             content=ft.TextField(
                 label="Введите дату (дд.мм.гггг)",
                 hint_text="Например: 20.10.2025",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor
+                width=500,
             ),
             border_radius=15
         )
@@ -73,25 +105,27 @@ class AddKriptoproFindEmpl:
         self.employee_save_button = ft.ElevatedButton(
             text="Сохранить сотрудника",
             on_click=self.submit_form,
-            bgcolor=defaultBgColor,
-            color=defaultFontColor,
+            bgcolor=ft.Colors.BLUE_100,
+            # color=ft.Colors.BLUE_100,
         )
 
         self.result_text = ft.Text("")
 
+
+    # метод сработает при выборе поля "бессрочная" для срока действия лицензии
+    def change_finishdate_input(self):
     # Диалоговое окно для подтверждения добавления ECP
 
     def submit_form(self, e):
         # full_name = self.employee_name_input.content.value.strip()
         install_location = self.instal_location_input.content.value.strip()
         licens_type = self.licens_type_input.content.value.strip()
+        version = self.version_input.content.value
         start_date = datetime.strptime(str(self.start_date_input.content.value).strip(), "%d.%m.%Y").date()
         finish_date = datetime.strptime(str(self.finish_date_input.content.value).strip(), "%d.%m.%Y").date()
 
-
-
         # Проверка на заполненность всех полей
-        if not (install_location and licens_type and start_date and finish_date):
+        if not (install_location and licens_type and version and start_date and finish_date):
             self.result_text.value = "Пожалуйста, заполните все поля."
             self.result_text.color = ft.Colors.RED
             self.page.update()
@@ -111,13 +145,13 @@ class AddKriptoproFindEmpl:
                 employee_id = self.page.session.get("employee_id")
                 employee: Employee = get_one_employees_with_id(employee_id=employee_id)
 
-
                 print(f"сотрудник в методе submit_form: ", employee)
                 # напишем функцию для добавления объекта ecp в базу данных
                 create_kriptopro(employees_id=employee.id,
                                  kriptopro_data=KriptoproRequestAdd(
                                      install_location=install_location,
                                      licens_type=licens_type,
+                                     version=version,
                                      start_date=start_date,
                                      finish_date=finish_date
                                  ))
@@ -151,7 +185,6 @@ class AddKriptoproFindEmpl:
 
                 self.page.update()
 
-
     def view(self, page: ft.Page, params: Params, basket: Basket):
         page.title = "Добавление криптопро"
         page.window.width = defaultWithWindow
@@ -159,19 +192,17 @@ class AddKriptoproFindEmpl:
         page.window.min_width = 1000
         page.window.min_height = 600
 
-
         # полное имя сотрудник
         self.employee_full_name = ft.Text(
-                value=self.page.session.get("employee_name"),
-                bgcolor=secondaryBgColor,
-                color=secondaryFontColor)
+            value=self.page.session.get("employee_name"),
+            bgcolor=secondaryBgColor,
+            color=secondaryFontColor)
 
-
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
                                     icon_size=20,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=ft.Colors.GREY_300,
+                                    shadow_color=ft.Colors.GREY_300,
                                     )
 
         # Панель сайдбар
@@ -179,7 +210,7 @@ class AddKriptoproFindEmpl:
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
                     ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
@@ -199,6 +230,7 @@ class AddKriptoproFindEmpl:
             controls=[
                 ft.Row(
                     expand=True,
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
                         # левая сторона
                         ft.Container(
@@ -206,13 +238,12 @@ class AddKriptoproFindEmpl:
                             content=ft.Column(
                                 controls=[
 
-
                                     ft.TextButton("Домой",
                                                   icon=ft.Icons.HOME,  # Иконка "домой"
                                                   style=ft.ButtonStyle(
                                                       color={ft.ControlState.HOVERED: ft.Colors.BLUE,
                                                              # Цвет при наведении
-                                                             ft.ControlState.DEFAULT: ft.Colors.BLACK},
+                                                             ft.ControlState.DEFAULT: ft.Colors.GREY_300},
                                                       # Цвет по умолчанию
                                                       shape=ft.RoundedRectangleBorder(radius=8),  # Округлённые углы
                                                       padding=ft.padding.all(12),  # Внутренние отступы
@@ -222,20 +253,20 @@ class AddKriptoproFindEmpl:
                                     sidebar_menu,
                                 ]
                             ),
-                            bgcolor=secondaryBgColor
+                            bgcolor=secondaryBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
 
                         ),
                         ft.Container(
-                            expand=2,
-                            padding=ft.padding.only(20, top=40, right=10, bottom=40),
+                            expand=4,
                             content=ft.Column(
-                                alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
                                     self.text_add,
-                                    self.employee_full_name, # todo вывести имя которому добавляется эцп
+                                    self.employee_full_name,  # todo вывести имя которому добавляется эцп
                                     self.instal_location_input,
                                     self.licens_type_input,
+                                    self.version_input,
                                     self.start_date_input,
                                     self.finish_date_input,
                                     self.result_text,
@@ -243,11 +274,12 @@ class AddKriptoproFindEmpl:
                                     self.employee_save_button
 
                                 ]
-                            )
+                            ),
+                            bgcolor=defaultBgColor,
+                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
+
                         ),
-                        ft.Container(
-                            expand=4,
-                        )
                     ]
                 )
             ],

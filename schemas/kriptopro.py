@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class KriptoproRequestAdd(BaseModel):
     install_location: str
     licens_type: str
+    version: int
     start_date: date
     finish_date: date
 
@@ -14,6 +15,7 @@ class KriptoproAdd(BaseModel):
     employees_id: int
     install_location: str
     licens_type: str
+    version: int
     start_date: date
     finish_date: date
 
@@ -21,6 +23,7 @@ class KriptoproAdd(BaseModel):
 class KriptoproPut(BaseModel):
     install_location: str
     licens_type: str
+    version: int
     start_date: date
     finish_date: date
 
@@ -28,5 +31,6 @@ class KriptoproPut(BaseModel):
 class KriptoproPath(BaseModel):
     install_location: str
     licens_type: str
+    version: int
     start_date: date
     finish_date: date

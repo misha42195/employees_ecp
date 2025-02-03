@@ -12,18 +12,18 @@ def create_notification():
     # Формируем сообщения
     messages = []
     for employee, ecps, kriptos in employees_with_objects:
-        employee_message = [f"🔴⚠️Сотрудник: {employee.full_name}"]
+        employee_message = [f"⚠️Сотрудник: {employee.full_name}"]
 
         for ecp in ecps:
             days_left = (ecp.finish_date - datetime.now().date()).days
             employee_message.append(
-                f"  ECP заканчивается: {ecp.finish_date.strftime('%Y-%m-%d')}, осталось {days_left} дней"
+                f"  ЭЦП заканчивается: {ecp.finish_date.strftime('%Y-%m-%d')}, осталось {days_left} дней"
             )
 
         for kripto in kriptos:
             days_left = (kripto.finish_date - datetime.now().date()).days
             employee_message.append(
-                f"  Kriptos заканчивается: {kripto.finish_date.strftime('%Y-%m-%d')}, осталось {days_left} дней"
+                f"  Криптопро заканчивается: {kripto.finish_date.strftime('%Y-%m-%d')}, осталось {days_left} дней"
             )
 
         messages.append("\n".join(employee_message))

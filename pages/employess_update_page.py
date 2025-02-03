@@ -164,14 +164,14 @@ class UpdateEmployeesPage:
             color=defaultFontColor,
         )
 
-
-
-
         style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
                                     icon_size=20,
+                                    text_style=ft.TextStyle(size=16),
                                     overlay_color=hoverBgColor,
                                     shadow_color=hoverBgColor,
                                     )
+
+
 
         # Панель сайдбар
         sidebar_menu = ft.Container(

@@ -41,7 +41,7 @@ def create_kriptopro(
 def full_update_kriptopro(
     employees_id: int,
     kriptopro_id: int,
-    kriptopro_data: KriptoproRequestAdd = Body()
+    kriptopro_data: KriptoproRequestAdd
 ):
     with session_maker() as session:
         _kriptopro_data = KriptoproPut(**kriptopro_data.model_dump())

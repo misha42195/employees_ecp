@@ -20,7 +20,7 @@ class DashboardPage:
         self.result_text = ft.Text("", color=ft.Colors.WHITE)
         self.employee_info = ft.ListView(expand=True)
         self.current_page = 1
-        self.page_size = 2
+        self.page_size = 16
         self.total_pages = 1
         self.result_text = ft.Text()
         self.load_employees()
@@ -44,26 +44,7 @@ class DashboardPage:
             )
         ])
 
-    # Функция удаления сотрудника
-    def delete_employee(self, emp):
 
-        try:
-            # Переменная для хранения найденного сотрудника
-            employee = emp
-            employee_id = employee.id
-            # Удаляем сотрудника
-            delete_employee(employee_id=employee_id)
-            self.result_text.value = f"Сотрудник {employee.full_name} успешно удалён."
-            self.result_text.color = ft.Colors.GREEN
-            self.page.update()
-            time.sleep(2)
-            self.result_text.value = ""
-
-        except Exception as ex:
-            self.result_text.value = f"Ошибка при удалении: {str(ex)}"
-            self.result_text.color = ft.Colors.RED
-            self.page.update()
-        self.load_employees()
 
     # переход на страницу обновления данных сотрудника
     def edit_employee(self, employee_id, employee_name):
@@ -99,6 +80,18 @@ class DashboardPage:
                 self.employee_info.controls.clear()
                 self.page.update()
                 return
+
+            # Сортировка сотрудников по минимальной дате окончания ЭЦП
+            def get_min_ecp_date(employee):
+                if employee.ecp:
+                    dates = [
+                        ecp_record.finish_date.date() if isinstance(ecp_record.finish_date, datetime) else ecp_record.finish_date
+                        for ecp_record in employee.ecp
+                    ]
+                    return min(dates) if dates else datetime.max.date()
+                return datetime.max.date()
+
+            employees.sort(key=lambda emp_tuple: get_min_ecp_date(emp_tuple[0]))
 
             # Расчёт данных для текущей страницы
             self.total_pages = ceil(len(employees) / self.page_size)
@@ -194,11 +187,13 @@ class DashboardPage:
         page.window.min_height = 600
         page.scroll = "adaptive"
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+
+
+        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
                                     icon_size=20,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=ft.Colors.GREY_300,
+                                    shadow_color=ft.Colors.GREY_300,
                                     )
 
         # Панель сайдбар
