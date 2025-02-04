@@ -3,6 +3,7 @@ from datetime import datetime
 import flet as ft
 import time
 
+from dateutil.relativedelta import relativedelta
 from flet_route import Params, Basket
 
 from crud.employees import get_one_with_employees_full_name, get_one_employees_with_id
@@ -63,6 +64,7 @@ class AddKriptoproFindEmpl:
             ),
             border_radius=15
         )
+
         self.license_action = ft.Container(
             content=ft.Dropdown(
                 label="Срок действия",
@@ -71,16 +73,17 @@ class AddKriptoproFindEmpl:
                 filled=None,
                 width=500,
                 options=[
-                    ft.dropdown.Option(key="Срочная"),
-                    ft.dropdown.Option(key=" Бессрочная",on_click=self.change_finishdate_input)
-                ]
-
-            )
+                    ft.dropdown.Option(key="Срочная", text="Срочная"),
+                    ft.dropdown.Option(key="Бессрочная", text="Бессрочная"),
+                ],
+                on_change=self.change_finishdate,  # Добавляем обработчик изменения выбора
+            ),
+            border_radius=15
         )
 
         self.start_date_input = ft.Container(
             content=ft.TextField(
-                label="Введите дату (дд.мм.гггг)",
+                label="Дата начала действия лицензии (дд.мм.гггг)",
                 hint_text="Например: 20.10.2025",
                 bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
@@ -92,7 +95,7 @@ class AddKriptoproFindEmpl:
         # дата завершения лицензии
         self.finish_date_input = ft.Container(
             content=ft.TextField(
-                label="Введите дату (дд.мм.гггг)",
+                label="Дата начала действия лицензии (дд.мм.гггг)",
                 hint_text="Например: 20.10.2025",
                 bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
@@ -109,13 +112,30 @@ class AddKriptoproFindEmpl:
             # color=ft.Colors.BLUE_100,
         )
 
-        self.result_text = ft.Text("")
-
+        self.result_text = ft.Text("",color=ft.Colors.GREEN)
 
     # метод сработает при выборе поля "бессрочная" для срока действия лицензии
-    def change_finishdate_input(self):
-    # Диалоговое окно для подтверждения добавления ECP
+    def change_finishdate(self, e):
+        selected_value = self.license_action.content.value.strip()  # Убираем лишние пробелы
 
+        if selected_value == "Бессрочная":
+            self.finish_date_input.visible = False
+            # self.result_text.color.
+            self.result_text.value = "Срок действия лицензии криптопро 10 лет"
+            self.finish_date_input.content.value = (datetime.today() + relativedelta(years=10)).strftime('%d.%m.%Y')
+        else:
+            self.finish_date_input.visible = True
+            self.result_text.value = ""
+            self.finish_date_input.content.value = ""
+
+        # Обновляем элементы
+        self.finish_date_input.update()  # Обновляем поле даты
+        self.result_text.update()  # Обновляем текст результата
+        self.license_action.update()  # Обновляем dropdown
+        self.page.update()  # Обновляем всю страницу
+
+
+    # Диалоговое окно для подтверждения добавления ECP
     def submit_form(self, e):
         # full_name = self.employee_name_input.content.value.strip()
         install_location = self.instal_location_input.content.value.strip()
@@ -132,6 +152,11 @@ class AddKriptoproFindEmpl:
             return
 
         # Проверка даты окончания
+        if finish_date <= start_date:
+            self.result_text.value = "Дата окончания должна быть больше даты начала."
+            self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
         if finish_date <= datetime.today().date():
             self.result_text.value = "Дата окончания должна быть больше сегодняшней даты."
             self.result_text.color = ft.Colors.RED
@@ -267,6 +292,7 @@ class AddKriptoproFindEmpl:
                                     self.instal_location_input,
                                     self.licens_type_input,
                                     self.version_input,
+                                    self.license_action,
                                     self.start_date_input,
                                     self.finish_date_input,
                                     self.result_text,

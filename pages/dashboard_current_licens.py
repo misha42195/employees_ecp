@@ -8,7 +8,7 @@ from crud.employees import get_all_employees_ecp_kripto
 from utils.style import *
 
 
-class DashboardPage:
+class DashboardCurrentLicensPage:
 
     def __init__(self, page: ft.Page):
         self.pagination_controls = ft.Row()
@@ -52,6 +52,10 @@ class DashboardPage:
 
     def go_easisted_licenses(self, e):
         self.page.go("/dashboard_easisted_licenses")
+
+
+
+
 
     def update_pagination_controls(self):
         """Обновляет элементы управления пагинацией."""
@@ -107,6 +111,7 @@ class DashboardPage:
                 self.page.update()
                 return
 
+
             # Сортировка сотрудников по минимальной дате окончания ЭЦП
             def get_min_ecp_date(employee):
                 if employee.ecp:
@@ -119,6 +124,8 @@ class DashboardPage:
                 return datetime.max.date()
 
             employees.sort(key=lambda emp_tuple: get_min_ecp_date(emp_tuple[0]))
+
+
 
             # Расчёт данных для текущей страницы
             self.total_pages = ceil(len(employees) / self.page_size)
@@ -207,7 +214,7 @@ class DashboardPage:
             self.load_employees()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Домашняя страница"
+        page.title = "Действующие лицензии"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
@@ -242,7 +249,7 @@ class DashboardPage:
         )
 
         return ft.View(
-            "/dashboard",
+            "/dashboard_current_licens",
             controls=[
                 ft.Row(
                     expand=True,

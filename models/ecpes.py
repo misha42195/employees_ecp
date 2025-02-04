@@ -24,5 +24,5 @@ class EcpORM(Base):
     start_date: Mapped[date] = mapped_column(Date)  # начала лицензии
     finish_date: Mapped[date] = mapped_column(Date)  # окончания лицензии
 
-# Обратная связь с EmployeesORM
+    # Обратная связь с EmployeesORM
     employee = relationship("EmployeesORM", back_populates="ecp")

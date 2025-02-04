@@ -217,6 +217,12 @@ class AddEcpFindEmpl:
             self.page.update()
             return
 
+        if finish_date <= start_date:
+            self.result_text.value = "Дата окончания должна быть больше даты начала."
+            self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
+
         # Проверка даты окончания
         if finish_date <= datetime.today().date():
             self.result_text.value = "Дата окончания должна быть больше сегодняшней даты."

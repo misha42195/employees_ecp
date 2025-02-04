@@ -14,6 +14,8 @@ class EmployeesInfoPage:
     def __init__(self, page: ft.Page):
         self.page = page  # Главная страница приложения
 
+        self.result_text = ft.Text("", color=ft.Colors.BLACK)
+
         # Элементы интерфейса
         self.text_add = ft.Text(
             f"Данные сотрудника",
@@ -55,7 +57,7 @@ class EmployeesInfoPage:
             # auto_scroll=True,  # Автопрокрутка
         )
 
-        self.result_text = ft.Text("", color=ft.Colors.BLACK)
+
 
     def go_home(self):
         self.page.go("/")
@@ -407,7 +409,7 @@ class EmployeesInfoPage:
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Версия лицензии:        ",color=ft.Colors.BLUE,size=18),
+                                ft.Text(f"Версия лицензии:        ", color=ft.Colors.BLUE, size=18),
                                 ft.Text(f"{kriptos_record.version}", color=defaultFontColor, size=18)
                             ]
                         ),
@@ -528,13 +530,14 @@ class EmployeesInfoPage:
                             border=ft.border.all(1, menuFontColor),  # Одинарная рамка
                             border_radius=ft.border_radius.all(12),  # Закругленные углы
                             content=ft.Container(
-                                content=ft.Column(controls=[
-                                    # ft.Divider(),
-                                    self.result_text,
-                                    self.employee_info_left,
-                                    # ft.Divider(),
-                                    self.employee_info_right
-                                ])
+
+                                content=ft.Column(
+                                    controls=[
+                                        self.result_text,
+                                        self.employee_info_left,
+                                        # ft.Divider(),
+                                        self.employee_info_right
+                                    ])
                                 ,
                             ),
                         ),
