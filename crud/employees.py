@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
+from certifi import where
 from oauthlib.uri_validate import query
-from sqlalchemy import select, insert, func, delete, update
+from sqlalchemy import select, insert, func, delete, update, or_, desc, and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.operators import exists
 
 from models.ecpes import EcpORM
 from models.kriptoproies import KriptosORM
@@ -16,6 +18,30 @@ from database import session_maker, engine
 from repositories.employees import EmployeesRepository
 
 from models.employess import EmployeesORM
+
+current_date = datetime.today().date()
+print(f"current_date", current_date)
+
+
+
+
+def get_all_employees():
+    with session_maker() as session:
+        query = (
+            select(EmployeesORM)
+            .outerjoin(EcpORM, EmployeesORM.id == EcpORM.employees_id)
+            .outerjoin(KriptosORM, EmployeesORM.id == KriptosORM.employees_id)
+                 .options(
+            joinedload(EmployeesORM.ecp),
+                joinedload(EmployeesORM.kriptos))
+                 .where(or_(EcpORM.finish_date >= current_date,
+                            KriptosORM.finish_date >= current_date)))
+
+        print(f":ЗАПРОС", query.compile(compile_kwargs={"literal_binds": True}))
+        result = session.execute(query)
+        res = result.unique().all()
+        print(res)
+        return res
 
 
 def get_all_employees_ecp_kripto():
@@ -97,8 +123,14 @@ def add_employee(employee_data: EmployeePost):
             raise ValueError(f"Ошибка при добавлении сотрудника: {str(e)}")
 
 
-def get_employees_with_expiring_licenses() -> List[
-    Tuple[EmployeesORM, List[EcpORM], List[KriptosORM]]]:
+from datetime import datetime, timedelta
+from typing import List, Tuple
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import select
+
+
+
+def get_employees_with_expiring_licenses():
     current_date = datetime.now()
     date_limit = current_date + timedelta(days=20)
 
@@ -108,14 +140,14 @@ def get_employees_with_expiring_licenses() -> List[
         ecp_stmt = (
             select(EmployeesORM, EcpORM)
             .join(EcpORM, EmployeesORM.ecp)
-            .where(EcpORM.finish_date <= date_limit)
+            .where((EcpORM.finish_date <= date_limit) & (EcpORM.finish_date >= current_date))
         )
         ecps = session.execute(ecp_stmt).all()
 
         kriptos_stmt = (
             select(EmployeesORM, KriptosORM)
             .join(KriptosORM, EmployeesORM.kriptos)
-            .where(KriptosORM.finish_date <= date_limit)
+            .where((KriptosORM.finish_date <= date_limit) & (KriptosORM.finish_date >= current_date))
         )
         kriptos = session.execute(kriptos_stmt).all()
 
@@ -137,14 +169,56 @@ def get_employees_with_expiring_licenses() -> List[
 
         return result
 
+#
+# def get_employees_with_expiring_licenses() -> List[
+#     Tuple[EmployeesORM, List[EcpORM], List[KriptosORM]]]:
+#     current_date = datetime.now()
+#     date_limit = current_date + timedelta(days=20)
+#
+#     with session_maker() as session:
+#         result = []
+#
+#         ecp_stmt = (
+#             select(EmployeesORM, EcpORM)
+#             .join(EcpORM, EmployeesORM.ecp)
+#             .where((EcpORM.finish_date <= date_limit))
+#         )
+#         ecps = session.execute(ecp_stmt).all()
+#
+#         kriptos_stmt = (
+#             select(EmployeesORM, KriptosORM)
+#             .join(KriptosORM, EmployeesORM.kriptos)
+#             .where(KriptosORM.finish_date <= date_limit)
+#         )
+#         kriptos = session.execute(kriptos_stmt).all()
+#
+#         employee_dict = {}
+#
+#         for employee, ecp in ecps:
+#             if employee not in employee_dict:
+#                 employee_dict[employee] = {"ecp": [], "kriptos": []}
+#             employee_dict[employee]["ecp"].append(ecp)
+#
+#         for employee, kripto in kriptos:
+#             if employee not in employee_dict:
+#                 employee_dict[employee] = {"ecp": [], "kriptos": []}
+#             employee_dict[employee]["kriptos"].append(kripto)
+#
+#         # Формируем итоговый список
+#         for employee, related_objects in employee_dict.items():
+#             result.append((employee, related_objects["ecp"], related_objects["kriptos"]))
+#
+#         return result
 
-def get_one_employees_with_id(employee_id:int):
+
+def get_one_employees_with_id(employee_id: int):
     with session_maker() as session:
         query = select(EmployeesORM).where(EmployeesORM.id == employee_id)
-        print(query.compile(compile_kwargs={"literal_binds":True}))
-        result= session.execute(query)
+        print(query.compile(compile_kwargs={"literal_binds": True}))
+        result = session.execute(query)
         result = result.scalars().one()
         return result
+
 
 def delete_employee(
     employee_id: int,

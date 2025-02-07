@@ -28,20 +28,21 @@ class DashboardCurrentLicensPage:
                     content=ft.Text("Фильтрация"),
                     controls=[
                         ft.MenuItemButton(
-                            content=ft.Text("Все сотрудники"),
-                            on_click=self.go_home
+                            content=ft.Text("действующие"),
+                            on_click=self.go_home,
                         ),
                         ft.MenuItemButton(
-                            content=ft.Text("Сотрудники с лицензиями"),
-                            on_click=self.go_current_licenses  # todo реализовать
+                            content=ft.Text("все сотрудники"),
+                            on_click=self.go_current_licenses  #
                         ),
                         ft.MenuItemButton(
-                            content=ft.Text("Истекшие лицензии с эцп и криптопро"),
+                            content=ft.Text("просроченные"),
                             on_click=self.go_easisted_licenses  # todo реализовать
                         ),
                     ],
                 )
             ]
+
         )
 
     def go_home(self, e):
@@ -52,10 +53,6 @@ class DashboardCurrentLicensPage:
 
     def go_easisted_licenses(self, e):
         self.page.go("/dashboard_easisted_licenses")
-
-
-
-
 
     def update_pagination_controls(self):
         """Обновляет элементы управления пагинацией."""
@@ -111,21 +108,46 @@ class DashboardCurrentLicensPage:
                 self.page.update()
                 return
 
+            # Функция для получения минимальной даты окончания ЭЦП
+            def get_min_ecp_date(employee):
+                dates = [
+                    ecp_record.finish_date.date() if isinstance(ecp_record.finish_date,
+                                                                datetime) else ecp_record.finish_date
+                    for ecp_record in (employee.ecp or [])  # Если нет записей, используем пустой список
+                ]
+                return min(dates, default=datetime.max.date())  # Если нет дат, возвращаем максимальную дату
+
+            # Функция для получения минимальной даты окончания КриптоПро
+            def get_min_kripto_date(employee):
+                dates = [
+                    kripto_record.finish_date.date() if isinstance(kripto_record.finish_date,
+                                                                   datetime) else kripto_record.finish_date
+                    for kripto_record in (employee.kriptos or [])
+                ]
+                return min(dates, default=datetime.max.date())  # Если нет дат, возвращаем максимальную дату
+
+            # Функция для получения минимальной даты из ЭЦП и КриптоПро
+            def get_min_ecp_kripto_date(employee):
+                ecp_date = get_min_ecp_date(employee)
+                kripto_date = get_min_kripto_date(employee)
+
+                return min(ecp_date, kripto_date)  # Берем минимальную из двух дат
+
+            # Сортировка сотрудников
+            employees.sort(key=lambda emp_tuple: get_min_ecp_kripto_date(emp_tuple[0]))
 
             # Сортировка сотрудников по минимальной дате окончания ЭЦП
-            def get_min_ecp_date(employee):
-                if employee.ecp:
-                    dates = [
-                        ecp_record.finish_date.date() if isinstance(ecp_record.finish_date,
-                                                                    datetime) else ecp_record.finish_date
-                        for ecp_record in employee.ecp
-                    ]
-                    return min(dates) if dates else datetime.max.date()
-                return datetime.max.date()
-
-            employees.sort(key=lambda emp_tuple: get_min_ecp_date(emp_tuple[0]))
-
-
+            # def get_min_ecp_date(employee):
+            #     if employee.ecp:
+            #         dates = [
+            #             ecp_record.finish_date.date() if isinstance(ecp_record.finish_date,
+            #                                                         datetime) else ecp_record.finish_date
+            #             for ecp_record in employee.ecp
+            #         ]
+            #         return min(dates) if dates else datetime.max.date()
+            #     return datetime.max.date()
+            #
+            # employees.sort(key=lambda emp_tuple: get_min_ecp_date(emp_tuple[0]))
 
             # Расчёт данных для текущей страницы
             self.total_pages = ceil(len(employees) / self.page_size)
@@ -221,19 +243,20 @@ class DashboardCurrentLicensPage:
         page.window.min_height = 600
         page.scroll = "adaptive"
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
-                                    icon_size=20,
+        style_menu = ft.ButtonStyle(color='#FBF0F0',
+                                    icon_size=30,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=ft.Colors.GREY_300,
-                                    shadow_color=ft.Colors.GREY_300,
+                                    overlay_color=defaultBgColor,
+                                    shadow_color=defaultBgColor,
                                     )
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
+
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
                     ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
@@ -247,6 +270,33 @@ class DashboardCurrentLicensPage:
                 ]
             )
         )
+
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+        #                             icon_size=20,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=ft.Colors.GREY_300,
+        #                             shadow_color=ft.Colors.GREY_300,
+        #                             )
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=menuFontColor, size=12),
+        #             ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/employees")),
+        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
 
         return ft.View(
             "/dashboard_current_licens",
@@ -264,7 +314,7 @@ class DashboardCurrentLicensPage:
                                 ]
                             ),
                             bgcolor=secondaryBgColor,
-                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
                             padding=ft.padding.all(10),  # Внутренние отступы
                         ),
                         # Контейнер с данными сотрудников
@@ -286,12 +336,12 @@ class DashboardCurrentLicensPage:
                                 ]
                             ),
                             bgcolor=defaultBgColor,
-                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
                             padding=ft.padding.all(10),  # Внутренние отступы
                         )
                     ]
                 )
             ],
-            bgcolor=defaultBgColor,
+            # bgcolor=defaultBgColor,
             padding=0,
         )

@@ -57,9 +57,9 @@ class EmployeesPage:
             on_click=self.submit_form,  # Привязка кнопки к обработчику
             tooltip="Поиск сотрудника по ФИО",
             icon=ft.Icons.SEARCH,
-            bgcolor=ft.Colors.BLUE_300,
-            color=defaultFontColor,
-            height=40,
+            bgcolor='#F5EEE6',
+            color =defaultBgColor,
+            height=40
         )
 
         self.add_ecp_button = ft.ElevatedButton(
@@ -386,21 +386,22 @@ class EmployeesPage:
 
         self.submit_form(None)
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        style_menu = ft.ButtonStyle(color='#FBF0F0',
                                     icon_size=30,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=defaultBgColor,
+                                    shadow_color=defaultBgColor,
                                     )
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
+
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    # ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
-                    #               on_click=lambda e: self.page.go("/employees")),
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
+                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+                                  on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
@@ -412,6 +413,33 @@ class EmployeesPage:
                 ]
             )
         )
+
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        #                             icon_size=30,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=hoverBgColor,
+        #                             shadow_color=hoverBgColor,
+        #                             )
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=menuFontColor, size=12),
+        #             # ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/employees")),
+        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
 
         return ft.View(
             "/employees",
@@ -443,7 +471,7 @@ class EmployeesPage:
                                 ]
                             ),
                             bgcolor=secondaryBgColor,
-                            border=ft.border.all(1,"#808080"),
+                            # border=ft.border.all(1,"#808080"),
                             padding=ft.padding.all(10),
 
                         ),
@@ -462,7 +490,7 @@ class EmployeesPage:
                                 ],
                             ),
                             bgcolor=defaultBgColor,
-                            border=ft.border.all(1,"#808080"),
+                            # border=ft.border.all(1,"#808080"),
                             padding=ft.padding.all(10),
                         ),
 

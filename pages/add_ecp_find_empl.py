@@ -1,3 +1,5 @@
+
+
 from datetime import datetime
 
 import flet as ft
@@ -313,19 +315,20 @@ class AddEcpFindEmpl:
             bgcolor=secondaryBgColor,
             color=secondaryFontColor)
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
-                                    icon_size=20,
+        style_menu = ft.ButtonStyle(color='#FBF0F0',
+                                    icon_size=30,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=ft.Colors.GREY_300,
-                                    shadow_color=ft.Colors.GREY_300,
+                                    overlay_color=defaultBgColor,
+                                    shadow_color=defaultBgColor,
                                     )
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
+
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=ft.Colors.GREY_100, size=12),
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
                     ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
@@ -339,6 +342,35 @@ class AddEcpFindEmpl:
                 ]
             )
         )
+
+
+
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+        #                             icon_size=20,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=ft.Colors.GREY_300,
+        #                             shadow_color=ft.Colors.GREY_300,
+        #                             )
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=ft.Colors.GREY_100, size=12),
+        #             ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/employees")),
+        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
 
         return ft.View(
             "/add_ecp_find_empl",
@@ -369,7 +401,7 @@ class AddEcpFindEmpl:
                                 ]
                             ),
                             bgcolor=secondaryBgColor,
-                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
                             padding=ft.padding.all(10),
 
                         ),
@@ -400,7 +432,7 @@ class AddEcpFindEmpl:
                                 ]
                             ),
                             bgcolor=defaultBgColor,
-                            border=ft.border.all(1, "#808080"),
+                            # border=ft.border.all(1, "#808080"),
                             padding=ft.padding.all(10),
                         )
 

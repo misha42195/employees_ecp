@@ -1,12 +1,13 @@
 from datetime import datetime
 
-from crud.employees import get_employees_with_expiring_licenses
-
+from crud.employees import get_employees_with_expiring_licenses, get_all_employees
 
 
 def create_notification():
     employees_with_objects = get_employees_with_expiring_licenses()
-    print(f"данные {employees_with_objects}")
+
+
+    print(f"ДАННЫЕ                 {employees_with_objects}")
     if not employees_with_objects:
         return None
     # Формируем сообщения

@@ -296,24 +296,23 @@ class AddEcpPage:
         page.window.min_width = 1000
         page.window.min_height = 600
 
-
-
-
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        style_menu = ft.ButtonStyle(color='#FBF0F0',
                                     icon_size=30,
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    text_style=ft.TextStyle(size=16),
+                                    overlay_color=defaultBgColor,
+                                    shadow_color=defaultBgColor,
                                     )
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
+
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
-                    ft.TextButton("Данные сотрудника", icon=ft.Icons.WORK, style=style_menu,
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
+                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
-                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                    ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
                     #               on_click=lambda e: self.page.go("/add_ecp")),
@@ -336,7 +335,6 @@ class AddEcpPage:
                             expand=2,
                             content=ft.Column(
                                 controls=[
-
 
                                     ft.TextButton("Домой",
                                                   icon=ft.Icons.HOME,  # Иконка "домой"

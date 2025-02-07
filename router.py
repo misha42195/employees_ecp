@@ -17,6 +17,7 @@ from pages.dashboard import DashboardPage
 class Router:
     def __init__(self, page: ft.Page):
         self.page = page
+
         self.app_routes = [
             path(url="/", clear=False, view=DashboardPage(page=self.page).view),
             path(url="/employees", clear=False, view=EmployeesPage(page=self.page).view),

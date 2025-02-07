@@ -57,7 +57,16 @@ class EmployeesInfoPage:
             # auto_scroll=True,  # Автопрокрутка
         )
 
+    # переход на страницу обновления данных сотрудника
+    def edit_employee(self, employee_id, employee_name):
+        print(employee_id)
+        print(employee_name)
 
+        self.page.session.set("employee_id", employee_id)  # установка id для глобальной страницы
+
+        # self.page.go(f"/update_employees?employee_id={employee_id}")
+        self.page.go(f"/update_employees")
+        self.page.update()
 
     def go_home(self):
         self.page.go("/")
@@ -215,9 +224,27 @@ class EmployeesInfoPage:
                         alignment=ft.MainAxisAlignment.START,
                         controls=[
                             ft.FilledButton(
+                                "обновить данные",
+                                bgcolor=defaultBgColor,
+                                tooltip="обновление данных сотрудника",
+                                icon=ft.Icons.UPDATE,
+                                # bgcolor='#F5EEE6',
+                                height=40,
+                                on_click=lambda e: self.edit_employee(
+                                    employee_id=employee.id
+                                    ,employee_name=employee.full_name
+                                )
+
+                            )
+                        ]
+                    ),
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.START,
+                        controls=[
+                            ft.FilledButton(
                                 "Добавить эцп",
-                                # icon="add",
-                                bgcolor=ft.Colors.BLUE_300,
+                                icon=ft.Icons.ADD_BOX,
+                                bgcolor=defaultBgColor,
                                 tooltip="Добавить новый эцп",
                                 on_click=lambda e: self.add_ecp_page(
                                     employee_id=employee.id, employee_name=employee.full_name
@@ -231,8 +258,8 @@ class EmployeesInfoPage:
                             # self.add_kpr_button
                             ft.FilledButton(
                                 "Добавить кпр",
-                                # icon="add",
-                                bgcolor=ft.Colors.BLUE_300,
+                                icon=ft.Icons.ADD_BOX,
+                                bgcolor= defaultBgColor,
                                 tooltip="Добавить новый криптопро",
                                 on_click=lambda e: self.add_kpr_page(
                                     employee_id=employee.id, employee_name=employee.full_name
@@ -465,19 +492,20 @@ class EmployeesInfoPage:
 
         self.submit_form()
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+        style_menu = ft.ButtonStyle(color='#FBF0F0',
                                     icon_size=30,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=ft.Colors.GREY_300,
-                                    shadow_color=ft.Colors.GREY_300,
+                                    overlay_color=defaultBgColor,
+                                    shadow_color=defaultBgColor,
                                     )
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
+
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=12),
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
                     ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
@@ -491,6 +519,60 @@ class EmployeesInfoPage:
                 ]
             )
         )
+
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+        #                             icon_size=20,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=ft.Colors.GREY_300,
+        #                             shadow_color=ft.Colors.GREY_300,
+        #                             )
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=menuFontColor, size=12),
+        #             ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/employees")),
+        #             # ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
+
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+        #                             icon_size=30,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=ft.Colors.GREY_300,
+        #                             shadow_color=ft.Colors.GREY_300,
+        #                             )
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=menuFontColor, size=12),
+        #             ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/employees")),
+        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
 
         return ft.View(
             "/employees_info",  # Исправленный маршрут
@@ -527,7 +609,7 @@ class EmployeesInfoPage:
                             expand=4,
                             alignment=ft.alignment.bottom_left,
                             padding=ft.padding.all(20),  # Просторные внутренние отступы
-                            border=ft.border.all(1, menuFontColor),  # Одинарная рамка
+                            # border=ft.border.all(1, menuFontColor),  # Одинарная рамка
                             border_radius=ft.border_radius.all(12),  # Закругленные углы
                             content=ft.Container(
 

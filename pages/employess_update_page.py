@@ -14,53 +14,105 @@ class UpdateEmployeesPage:
         self.page = page  # основная страница приложения
 
         # Элементы интерфейса
-        self.text_add = ft.Text(f"Обновление данных сотрудника", color=defaultFontColor,
-                                weight=ft.FontWeight.NORMAL,
-                                text_align=ft.TextAlign.LEFT)
+        self.text_add = ft.Text(
+            "Обновление сотрудника",
+            color=defaultFontColor,
+            size=18,
+            weight=ft.FontWeight.NORMAL,
+            text_align=ft.TextAlign.LEFT
+        )
 
         # Поля ввода для "Сотрудника"
         self.employee_full_name_input = ft.Container(
             content=ft.TextField(
-                label="Введите новые ФИО сотрудника",
-                bgcolor=secondaryBgColor,
+                label="Введите ФИО сотрудника",
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
-            ),
+                width=500),
             border_radius=15,
         )
 
         self.employee_position_input = ft.Container(
             content=ft.TextField(
                 label="Введите должность",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
-            ),
+                width=500),
             border_radius=15,
         )
-
         self.employee_com_name_input = ft.Container(
             content=ft.TextField(
                 label="Введите имя компьютера",
-                bgcolor=secondaryBgColor,
+                bgcolor=ft.Colors.GREY_100,
                 border=ft.InputBorder.NONE,
                 filled=True,
-                color=secondaryFontColor,
-            ),
+            width=500),
             border_radius=15,
         )
+
+        # # Элементы интерфейса
+        # self.text_add = ft.Text(
+        #     f"Обновление данных сотрудника",
+        #     size=18,
+        #     color=defaultFontColor,
+        #     weight=ft.FontWeight.NORMAL,
+        #     text_align=ft.TextAlign.LEFT)
+        #
+        # # Поля ввода для "Сотрудника"
+        # self.employee_full_name_input = ft.Container(
+        #     content=ft.TextField(
+        #         label="Введите новые ФИО сотрудника",
+        #         bgcolor=ft.Colors.GREY_100,
+        #         border=ft.InputBorder.NONE,
+        #         filled=True,
+        #         width=500,
+        #     ),
+        #     border_radius=15,
+        # )
+        #
+        # self.employee_position_input = ft.Container(
+        #     content=ft.TextField(
+        #         label="Введите должность",
+        #         bgcolor=ft.Colors.GREY_100,
+        #         border=ft.InputBorder.NONE,
+        #         filled=True,
+        #         width=500,
+        #     ),
+        #     border_radius=15,
+        # )
+        #
+        # self.employee_com_name_input = ft.Container(
+        #     content=ft.TextField(
+        #         label="Введите имя компьютера",
+        #         bgcolor=ft.Colors.GREY_100,
+        #         border=ft.InputBorder.NONE,
+        #         filled=True,
+        #         width=500,
+        #     ),
+        #     border_radius=15,
+        # )
+        #
+        # # Создаем кнопку в методе view, где доступен self
+        # self.employee_save_button = ft.ElevatedButton(
+        #     text="Сохранить сотрудника",
+        #     on_click=self.submit_form,  # Указываем правильный обработчик
+        #     bgcolor=defaultBgColor,
+        #     icon="save",
+        #     height=40
+        #     # color=defaultFontColor,
+        # )
+
+        self.result_text = ft.Text("", color=ft.Colors.GREEN)
 
         # Создаем кнопку в методе view, где доступен self
         self.employee_save_button = ft.ElevatedButton(
             text="Сохранить сотрудника",
             on_click=self.submit_form,  # Указываем правильный обработчик
-            bgcolor=defaultBgColor,
-            color=defaultFontColor,
+            bgcolor=ft.Colors.BLUE_100,
+            # color=defaultFontColor,
         )
-
-    result_text = ft.Text("", color=ft.Colors.BLACK)
 
     def submit_form(self, e):
         """
@@ -79,8 +131,12 @@ class UpdateEmployeesPage:
             try:
                 employee_id = self.page.session.get("employee_id")  # получаем сотрудника
 
-                empl = update_employee(employee_id=employee_id, full_name=full_name, position=position,
-                                       com_name=company)
+                empl = update_employee(
+                    employee_id=employee_id,
+                    full_name=full_name,
+                    position=position,
+                    com_name=company
+                )
 
                 self.result_text.color = ft.Colors.GREEN
                 self.result_text.value = f"Сотрудник '{full_name}' успешно обновлен!"
@@ -110,45 +166,6 @@ class UpdateEmployeesPage:
 
         self.page.update()
 
-    # Элементы интерфейса
-    text_add = ft.Text("Добавление сотрудника", color=defaultFontColor,
-                       weight=ft.FontWeight.NORMAL,
-                       text_align=ft.TextAlign.LEFT
-                       )
-
-    # Поля ввода для "Сотрудника"
-    employee_full_name_input = ft.Container(
-        content=ft.TextField(
-            label="Введите ФИО сотрудника",
-            bgcolor=secondaryBgColor,
-            border=ft.InputBorder.NONE,
-            filled=True,
-            color=secondaryFontColor,
-        ),
-        border_radius=15,
-    )
-
-    employee_position_input = ft.Container(
-        content=ft.TextField(
-            label="Введите должность",
-            bgcolor=secondaryBgColor,
-            border=ft.InputBorder.NONE,
-            filled=True,
-            color=secondaryFontColor,
-        ),
-        border_radius=15,
-    )
-    employee_com_name_input = ft.Container(
-        content=ft.TextField(
-            label="Введите имя компьютера",
-            bgcolor=secondaryBgColor,
-            border=ft.InputBorder.NONE,
-            filled=True,
-            color=secondaryFontColor,
-        ),
-        border_radius=15,
-    )
-
     def view(self, page: ft.Page, params: Params, basket: Basket):
         page.title = "Обновление данных"
         page.window.width = defaultWithWindow
@@ -156,32 +173,30 @@ class UpdateEmployeesPage:
         page.window.min_width = 1000
         page.window.min_height = 600
 
-        # Создаем кнопку в методе view, где доступен self
-        self.employee_save_button = ft.ElevatedButton(
-            text="Сохранить сотрудника",
-            on_click=self.submit_form,  # Указываем правильный обработчик
-            bgcolor=defaultBgColor,
-            color=defaultFontColor,
+        # полное имя сотрудник
+        self.employee_full_name = ft.Text(
+            value=self.page.session.get("employee_name"),
+            bgcolor=secondaryBgColor,
+            color=secondaryFontColor
         )
 
-        style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-                                    icon_size=20,
+        style_menu = ft.ButtonStyle(color='#FBF0F0',
+                                    icon_size=30,
                                     text_style=ft.TextStyle(size=16),
-                                    overlay_color=hoverBgColor,
-                                    shadow_color=hoverBgColor,
+                                    overlay_color=defaultBgColor,
+                                    shadow_color=defaultBgColor,
                                     )
-
-
 
         # Панель сайдбар
         sidebar_menu = ft.Container(
+
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
-                    ft.Text("МЕНЮ", color=menuFontColor, size=20),
-                    # ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
-                    #               on_click=lambda e: self.page.go("/employees")),
-                    ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+                    ft.Text("МЕНЮ", color=menuFontColor, size=18),
+                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+                                  on_click=lambda e: self.page.go("/employees")),
+                    ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
                     # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
                     #               on_click=lambda e: self.page.go("/add_ecp")),
@@ -193,20 +208,74 @@ class UpdateEmployeesPage:
             )
         )
 
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
+        #                             icon_size=30,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=ft.Colors.GREY_300,
+        #                             shadow_color=ft.Colors.GREY_300,
+        #                             )
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=menuFontColor, size=12),
+        #             ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/employees")),
+        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
+
+        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
+        #                             icon_size=20,
+        #                             text_style=ft.TextStyle(size=16),
+        #                             overlay_color=hoverBgColor,
+        #                             shadow_color=hoverBgColor,
+        #                             )
+        #
+        #
+        #
+        # # Панель сайдбар
+        # sidebar_menu = ft.Container(
+        #     padding=ft.padding.symmetric(0, 13),
+        #     content=ft.Column(
+        #         controls=[
+        #             ft.Text("МЕНЮ", color=menuFontColor, size=20),
+        #             # ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/employees")),
+        #             ft.TextButton("Добавить нового сотрудника", icon=ft.Icons.ADD, style=style_menu,
+        #                           on_click=lambda e: self.page.go("/add_employees")),
+        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_ecp")),
+        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
+        #             #               on_click=lambda e: self.page.go("/add_crypto")),
+        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
+        #             #              on_click=lambda e: self.page.go("/delete_employees")),
+        #         ]
+        #     )
+        # )
+        # "/update_employees",
         return ft.View(
             "/update_employees",
             controls=[
                 ft.Row(
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     expand=True,
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-
                         # левая сторона
                         ft.Container(
                             expand=2,
                             content=ft.Column(
                                 controls=[
-
 
                                     ft.TextButton("Домой",
                                                   icon=ft.Icons.HOME,  # Иконка "домой"
@@ -223,31 +292,93 @@ class UpdateEmployeesPage:
                                     sidebar_menu,
                                 ]
                             ),
-                            bgcolor=secondaryBgColor
+                            bgcolor=secondaryBgColor,
+                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
 
                         ),
                         ft.Container(
                             expand=4,
-                            padding=ft.padding.only(20, top=40, right=10, bottom=40),
+                            # padding=ft.padding.only(20, top=40, right=10, bottom=40),
                             content=ft.Column(
-                                alignment=ft.MainAxisAlignment.START,
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                controls=[
+                                # alignment=ft.MainAxisAlignment.START,
+                                # horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                controls=[  # Обработчик клика (переход на главную страницу)
                                     self.text_add,
+                                    self.employee_full_name,
                                     self.employee_full_name_input,
                                     self.employee_position_input,
                                     self.employee_com_name_input,
                                     self.result_text,
 
-                                    self.employee_save_button,
+                                    self.employee_save_button, ]
+                            ),
+                            bgcolor=defaultBgColor,
+                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            padding=ft.padding.all(10),
 
-                                ]
-                            )
-                        ),
-
+                        )
                     ]
                 )
             ],
             bgcolor=defaultBgColor,
             padding=0,
         )
+
+        # return ft.View(
+        #     "/update_employees",
+        #     controls=[
+        #         ft.Row(
+        #             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        #             expand=True,
+        #             controls=[
+        #
+        #                 # левая сторона
+        #                 ft.Container(
+        #                     expand=2,
+        #                     content=ft.Column(
+        #                         controls=[
+        #
+        #                             ft.TextButton("Домой",
+        #                                           icon=ft.Icons.HOME,  # Иконка "домой"
+        #                                           style=ft.ButtonStyle(
+        #                                               color={ft.ControlState.HOVERED: ft.Colors.BLUE,
+        #                                                      # Цвет при наведении
+        #                                                      ft.ControlState.DEFAULT: ft.Colors.BLACK},
+        #                                               # Цвет по умолчанию
+        #                                               shape=ft.RoundedRectangleBorder(radius=8),  # Округлённые углы
+        #                                               padding=ft.padding.all(12),  # Внутренние отступы
+        #                                           ),
+        #                                           on_click=lambda e: self.page.go("/"),
+        #                                           ),  # Обработчик клика (переход на главную страницу)
+        #                             sidebar_menu,
+        #                         ]
+        #                     ),
+        #                     bgcolor=secondaryBgColor
+        #
+        #                 ),
+        #                 ft.Container(
+        #                     expand=4,
+        #                     padding=ft.padding.only(20, top=40, right=10, bottom=40),
+        #                     content=ft.Column(
+        #                         alignment=ft.MainAxisAlignment.START,
+        #                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        #                         controls=[
+        #                             self.text_add,
+        #                             self.employee_full_name_input,
+        #                             self.employee_position_input,
+        #                             self.employee_com_name_input,
+        #                             self.result_text,
+        #
+        #                             self.employee_save_button,
+        #
+        #                         ]
+        #                     )
+        #                 ),
+        #
+        #             ]
+        #         )
+        #     ],
+        #     bgcolor=defaultBgColor,
+        #     padding=0,
+        # )
