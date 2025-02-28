@@ -8,11 +8,11 @@ from flet_route import Params, Basket
 
 from crud.employees import get_one_with_employees_full_name, get_one_employees_with_id
 from crud.kriptoproies import create_kriptopro
-from model import Employee, ECP, KriptoPro, add_instance  # Ваши модели и функции
-from schemas.ecpies import EcpReqestAdd, EcpAdd
+from model import Employee  # Ваши модели и функции
+# from schemas.ecpies import EcpReqestAdd, EcpAdd
 from schemas.kriptopro import KriptoproRequestAdd
 from utils.style import *
-from crud.ecpies import create_ecp
+# from crud.ecpies import create_ecp
 
 
 class AddKriptoproFindEmpl:
@@ -141,12 +141,21 @@ class AddKriptoproFindEmpl:
         install_location = self.instal_location_input.content.value.strip()
         licens_type = self.licens_type_input.content.value.strip()
         version = self.version_input.content.value
-        start_date = datetime.strptime(str(self.start_date_input.content.value).strip(), "%d.%m.%Y").date()
-        finish_date = datetime.strptime(str(self.finish_date_input.content.value).strip(), "%d.%m.%Y").date()
+        start_date = self.start_date_input.content.value
+        finish_date = self.finish_date_input.content.value
 
         # Проверка на заполненность всех полей
         if not (install_location and licens_type and version and start_date and finish_date):
             self.result_text.value = "Пожалуйста, заполните все поля."
+            self.result_text.color = ft.Colors.RED
+            self.page.update()
+            return
+
+        try:
+            start_date = datetime.strptime(str(self.start_date_input.content.value).strip(), "%d.%m.%Y").date()
+            finish_date = datetime.strptime(str(self.finish_date_input.content.value).strip(), "%d.%m.%Y").date()
+        except ValueError:
+            self.result_text.value = "Введите корректную дату в формате дд.мм.гггг."
             self.result_text.color = ft.Colors.RED
             self.page.update()
             return
@@ -182,16 +191,17 @@ class AddKriptoproFindEmpl:
                                  ))
                 self.result_text.color = ft.Colors.GREEN
                 self.result_text.value = f"Сотруднику {employee.full_name} добавлен криптопро."
-
                 self.page.update()
-                time.sleep(2)
+                time.sleep(1)
                 self.result_text.value = ""
                 # Обнуляем поля формы
                 # self.employee_name_input.content.value = ""
                 self.instal_location_input.content.value = ""
                 self.licens_type_input.content.value = ""
-                self.start_date_input.content.value = ""
-                self.finish_date_input.content.value = ""
+                self.version_input.content.value = None
+                self.license_action.content.value = None
+                self.start_date_input.content.value = None
+                self.finish_date_input.content.value = None
                 self.page.go("/")
 
             except ValueError as er:
@@ -217,6 +227,7 @@ class AddKriptoproFindEmpl:
         page.window.min_width = 1000
         page.window.min_height = 600
 
+
         # полное имя сотрудник
         self.employee_full_name = ft.Text(
             value=self.page.session.get("employee_name"),
@@ -241,45 +252,10 @@ class AddKriptoproFindEmpl:
                                   on_click=lambda e: self.page.go("/employees")),
                     ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
                                   on_click=lambda e: self.page.go("/add_employees")),
-                    # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
-                    #               on_click=lambda e: self.page.go("/add_ecp")),
-                    # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
-                    #               on_click=lambda e: self.page.go("/add_crypto")),
-                    # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
-                    #              on_click=lambda e: self.page.go("/delete_employees")),
+
                 ]
             )
         )
-
-
-
-        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: defaultBgColor},
-        #                             icon_size=20,
-        #                             text_style=ft.TextStyle(size=16),
-        #                             overlay_color=ft.Colors.GREY_300,
-        #                             shadow_color=ft.Colors.GREY_300,
-        #                             )
-        #
-        # # Панель сайдбар
-        # sidebar_menu = ft.Container(
-        #     padding=ft.padding.symmetric(0, 13),
-        #     content=ft.Column(
-        #         controls=[
-        #             ft.Text("МЕНЮ", color=menuFontColor, size=18),
-        #             ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
-        #                           on_click=lambda e: self.page.go("/employees")),
-        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
-        #                           on_click=lambda e: self.page.go("/add_employees")),
-        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
-        #             #               on_click=lambda e: self.page.go("/add_ecp")),
-        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
-        #             #               on_click=lambda e: self.page.go("/add_crypto")),
-        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
-        #             #              on_click=lambda e: self.page.go("/delete_employees")),
-        #         ]
-        #     )
-        # )
-
         return ft.View(
             "/add_kriptopro_find_empl",
             controls=[
@@ -296,9 +272,9 @@ class AddKriptoproFindEmpl:
                                     ft.TextButton("Домой",
                                                   icon=ft.Icons.HOME,  # Иконка "домой"
                                                   style=ft.ButtonStyle(
-                                                      color={ft.ControlState.HOVERED: ft.Colors.BLUE,
+                                                      color={ft.ControlState.HOVERED: ft.Colors.GREY_100,
                                                              # Цвет при наведении
-                                                             ft.ControlState.DEFAULT: ft.Colors.GREY_300},
+                                                             ft.ControlState.DEFAULT: ft.Colors.GREY_100},
                                                       # Цвет по умолчанию
                                                       shape=ft.RoundedRectangleBorder(radius=8),  # Округлённые углы
                                                       padding=ft.padding.all(12),  # Внутренние отступы
@@ -309,7 +285,8 @@ class AddKriptoproFindEmpl:
                                 ]
                             ),
                             # bgcolor=secondaryBgColor,
-                            border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
+                            bgcolor=secondaryBgColor,
                             padding=ft.padding.all(10),
 
                         ),

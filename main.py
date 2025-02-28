@@ -14,8 +14,8 @@ def run_async():
 def main(page: ft.Page):
     page.title = "Основная страница"
 
-    check_trade = threading.Thread(target=run_async, daemon=True)
-    check_trade.start()
+    # check_trade = threading.Thread(target=run_async, daemon=True)
+    # check_trade.start()
 
     Router(page)
 

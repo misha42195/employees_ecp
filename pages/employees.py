@@ -1,9 +1,7 @@
 from datetime import datetime
 
-
 import flet as ft
 from flet_route import Params, Basket
-
 
 from utils.style import *
 from crud.employees import get_ecp_kriptopro_employee_name
@@ -18,6 +16,7 @@ class EmployeesPage:
         self.employee_info = ft.ListView(  # контейнер для отображения сотрудника
             controls=[],
             expand=True,
+            #padding=ft.Padding(left=0, top=0, right=0, bottom=0),
         )
 
         self.text_add = ft.Text(
@@ -51,14 +50,13 @@ class EmployeesPage:
             border_radius=15,
         )
 
-
         self.find_button = ft.ElevatedButton(  # кнопка запускает метод submit_form
             text="Найти сотрудника",
             on_click=self.submit_form,  # Привязка кнопки к обработчику
             tooltip="Поиск сотрудника по ФИО",
             icon=ft.Icons.SEARCH,
             bgcolor='#F5EEE6',
-            color =defaultBgColor,
+            color=defaultBgColor,
             height=40
         )
 
@@ -91,6 +89,7 @@ class EmployeesPage:
         self.page.session.set("employee_id", employee_id)  # установка id для глобальной страницы
         self.page.session.set("employee_name", employee_name)  # установка имени для вывода на странице добавления
         # self.page.go(f"/update_employees?employee_id={employee_id}")
+        self.employee_full_name_input.content.value = ""
         self.page.go(f"/add_ecp_find_empl")
         self.page.update()
 
@@ -101,6 +100,7 @@ class EmployeesPage:
 
         self.page.session.set("employee_id", employee_id)  # установка id для глобальной страницы
         self.page.session.set("employee_name", employee_name)
+        self.employee_full_name_input.content.value = ""
 
         # self.page.go(f"/update_employees?employee_id={employee_id}")
         self.page.go(f"/add_kriptopro_find_empl")
@@ -152,52 +152,67 @@ class EmployeesPage:
             self.employee_info.controls.extend([
                 ft.Row(
                     controls=[
-                        ft.Text(f"Сотрудник:             ", color=ft.Colors.BLUE_ACCENT_700, size=22 ),
-                        ft.Text(f"{employee.full_name}", color=defaultFontColor, size=18)
+                        ft.Text(f"Сотрудник:", color=ft.Colors.BLUE_ACCENT_700, size=22, expand=1),
+                        ft.Text(f"{employee.full_name}", color=defaultFontColor, size=18, expand=2)
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     spacing=10
                 ),
                 ft.Row(
                     controls=[
-                        ft.Text(f"Должность:                    ", color=ft.Colors.BLUE, size=18),
-                        ft.Text(f"{employee.position}", color=defaultFontColor, size=18)
+                        ft.Text(f"Должность:", color=ft.Colors.BLUE, size=18, expand=1),
+                        ft.Text(f"{employee.position}", color=defaultFontColor, size=18, expand=2)
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     spacing=10
                 ),
                 ft.Row(
                     controls=[
-                        ft.Text(f"Имя компьютера:         ", color=ft.Colors.BLUE, size=18, ),
-                        ft.Text(f"{employee.com_name}", color=defaultFontColor, size=18)
+                        ft.Text(f"Имя компьютера:", color=ft.Colors.BLUE, size=18, expand=1),
+                        ft.Text(f"{employee.com_name}", color=defaultFontColor, size=18, expand=2)
                     ],
                     alignment=ft.MainAxisAlignment.START,
                     spacing=10
                 ),
+                ft.Row(alignment=ft.MainAxisAlignment.START,
+                       expand=1,
+                       controls=[
+                           ft.FilledButton("обновить данные",
+                                           bgcolor=defaultBgColor,
+                                           tooltip="обновление данных сотрудника",
+                                           icon=ft.Icons.UPDATE,
+                                           height=40,
+                                           on_click=lambda e: self.edit_employee(employee_id=employee.id,
+                                                                                 employee_name=employee.full_name))
+                       ]),
+                ft.Row(expand=1,
+                       controls=[
+                           ft.FilledButton(
+                               "Добавить эцп",
+                               icon=ft.Icons.ADD_BOX,
+                               bgcolor=defaultBgColor,
+                               tooltip="Добавить новый эцп",
+                               on_click=lambda e: self.add_ecp_page(
+                                   employee_id=employee.id, employee_name=employee.full_name
+                               ),
+                           )
+                           # self.add_ecp_button,
+                       ]),
+                ft.Row(expand=1,
+                       controls=[
+                           ft.FilledButton(
+                               "Добавить кпр",
+                               icon=ft.Icons.ADD_BOX,
+                               bgcolor=defaultBgColor,
+                               tooltip="Добавить новый криптопро",
+                               on_click=lambda e: self.add_kpr_page(
+                                   employee_id=employee.id, employee_name=employee.full_name
+                               ),
+                           ),
+                       ]),
                 ft.Row(
-                    controls=[
-                        ft.ElevatedButton(
-                            "Добавить эцп",
-                            bgcolor=ft.Colors.BLUE_100,
-                            tooltip="Добавить новый эцп",
-                            on_click=lambda e: self.add_ecp_page(
-                                employee_id=employee.id, employee_name=employee.full_name
-                            ),
-                        )
-                        # self.add_ecp_button,
-                    ]),
-                ft.Row(controls=[
-                    # self.add_kpr_button
-                    ft.ElevatedButton(
-                        text="Добавить кпр",
-                        tooltip="Добавить новый криптопро",
-                        bgcolor=ft.Colors.BLUE_100,
-                        on_click=lambda e: self.add_kpr_page(
-                            employee_id=employee.id, employee_name=employee.full_name
-                        ),
-                    ),
-                ]),
-
+                    expand=1,
+                    controls=[ft.Text("")]),
                 ft.Divider(color=defaultBgColor),
             ])
 
@@ -211,100 +226,102 @@ class EmployeesPage:
 
                     self.employee_info.controls.extend([
                         ft.Row(controls=[
-                            ft.Text("ЭЦП",color=ft.Colors.BLUE_ACCENT_700,size=18)
+                            ft.Text("ЭЦП", color=ft.Colors.BLUE_ACCENT_700, size=18,expand=1)
                         ]),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Тип ЭЦП:                          ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.type_ecp}", color=defaultFontColor, size=18)
+                                ft.Text(f"Тип ЭЦП:", color=ft.Colors.BLUE, size=18,expand=1),
+                                ft.Text(f"{ecp_record.type_ecp}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Статус ЭЦП:                    ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.status_ecp}", color=defaultFontColor, size=18)
+                                ft.Text(f"Статус ЭЦП:", color=ft.Colors.BLUE, size=18,expand=1, ),
+                                ft.Text(f"{ecp_record.status_ecp}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Место установки:         ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.install_location}", color=defaultFontColor, size=18)
+                                ft.Text(f"Место установки:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{ecp_record.install_location}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Место хранения:          ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.storage_location}", color=defaultFontColor, size=18)
+                                ft.Text(f"Место хранения:", color=ft.Colors.BLUE, size=18, expand=1),
+                                ft.Text(f"{ecp_record.storage_location}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Прим. к СБИС:               ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.sbis}", color=defaultFontColor, size=18)
+                                ft.Text(f"Прим. к СБИС:", color=ft.Colors.BLUE, size=18, expand=1),
+                                ft.Text(f"{ecp_record.sbis}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Прим. к ЧЗ:                     ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.chz}", color=defaultFontColor, size=18)
+                                ft.Text(f"Прим. к ЧЗ:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{ecp_record.chz}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Прим. к Диадок:           ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.diadok}", color=defaultFontColor, size=18)
+                                ft.Text(f"Прим. к Диадок:", color=ft.Colors.BLUE, size=18,expand=1),
+                                ft.Text(f"{ecp_record.diadok}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Прим. к ФНС:                 ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.fns}", color=defaultFontColor, size=18)
+                                ft.Text(f"Прим. к ФНС:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{ecp_record.fns}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Прим. к отчетности:   ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.report}", color=defaultFontColor, size=18)
+                                ft.Text(f"Прим. к отчетности:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{ecp_record.report}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Прим. к фед.рес:          ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.fed_resours}", color=defaultFontColor, size=18)
+                                ft.Text(f"Прим. к фед.рес:", color=ft.Colors.BLUE, size=18, expand=1),
+                                ft.Text(f"{ecp_record.fed_resours}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Дата начала:                  ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.start_date}", color=defaultFontColor, size=18)
+                                ft.Text(f"Дата начала:", color=ft.Colors.BLUE, size=18,expand=1),
+                                ft.Text(f"{ecp_record.start_date.strftime('%d.%m.%Yг.')}", color=defaultFontColor,
+                                        size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Дата окончания:          ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{ecp_record.finish_date}", color=finish_date_color, size=18)
+                                ft.Text(f"Дата окончания:", color=ft.Colors.BLUE, size=18,expand=1),
+                                ft.Text(f"{ecp_record.finish_date.strftime('%d.%m.%Yг.')}", color=finish_date_color,
+                                        size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
@@ -321,42 +338,44 @@ class EmployeesPage:
 
                     self.employee_info.controls.extend([
                         ft.Row(controls=[
-                            ft.Text("КПР-csp",color=ft.Colors.BLUE_ACCENT_700,size=18)
+                            ft.Text("КПР-csp", color=ft.Colors.BLUE_ACCENT_700, size=18,expand=1)
                         ]),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Место установки:         ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{kriptos_record.install_location}", color=defaultFontColor, size=18)
+                                ft.Text(f"Место установки:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{kriptos_record.install_location}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Тип лицензии:               ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{kriptos_record.licens_type}", color=defaultFontColor, size=18)
+                                ft.Text(f"Тип лицензии:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{kriptos_record.licens_type}", color=defaultFontColor, size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Версия лицении:           ", color=ft.Colors.BLUE,size=18),
-                                ft.Text(f"{kriptos_record.version}", color=defaultFontColor,size=18)
+                                ft.Text(f"Версия лицении:", color=ft.Colors.BLUE, size=18,expand=1),
+                                ft.Text(f"{kriptos_record.version}", color=defaultFontColor, size=18,expand=2)
                             ]
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Дата начала:                  ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{kriptos_record.start_date}", color=defaultFontColor, size=18)
+                                ft.Text(f"Дата начала:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{kriptos_record.start_date.strftime('%d.%m.%Yг.')}", color=defaultFontColor,
+                                        size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
                         ),
                         ft.Row(
                             controls=[
-                                ft.Text(f"Дата окончания:          ", color=ft.Colors.BLUE, size=18, ),
-                                ft.Text(f"{kriptos_record.finish_date}", color=finish_date_color, size=18)
+                                ft.Text(f"Дата окончания:", color=ft.Colors.BLUE, size=18,expand=1 ),
+                                ft.Text(f"{kriptos_record.finish_date.strftime('%d.%m.%Yг.')}", color=finish_date_color,
+                                        size=18,expand=2)
                             ],
                             alignment=ft.MainAxisAlignment.START,
                             spacing=10
@@ -414,33 +433,6 @@ class EmployeesPage:
             )
         )
 
-        # style_menu = ft.ButtonStyle(color={ft.ControlState.HOVERED: ft.Colors.WHITE},
-        #                             icon_size=30,
-        #                             text_style=ft.TextStyle(size=16),
-        #                             overlay_color=hoverBgColor,
-        #                             shadow_color=hoverBgColor,
-        #                             )
-        #
-        # # Панель сайдбар
-        # sidebar_menu = ft.Container(
-        #     padding=ft.padding.symmetric(0, 13),
-        #     content=ft.Column(
-        #         controls=[
-        #             ft.Text("МЕНЮ", color=menuFontColor, size=12),
-        #             # ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
-        #             #               on_click=lambda e: self.page.go("/employees")),
-        #             ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
-        #                           on_click=lambda e: self.page.go("/add_employees")),
-        #             # ft.TextButton("Добавить ЕЦП", icon=ft.Icons.ADD, style=style_menu,
-        #             #               on_click=lambda e: self.page.go("/add_ecp")),
-        #             # ft.TextButton("Добавить Крипто ПРО", icon=ft.Icons.ADD, style=style_menu,
-        #             #               on_click=lambda e: self.page.go("/add_crypto")),
-        #             # ft.TextButton("Удалить сотрудника", icon=ft.Icons.DELETE, style=style_menu,
-        #             #              on_click=lambda e: self.page.go("/delete_employees")),
-        #         ]
-        #     )
-        # )
-
         return ft.View(
             "/employees",
             controls=[
@@ -477,6 +469,10 @@ class EmployeesPage:
                         ),
                         ft.Container(
                             expand=4,
+                            # expand=4,
+                            alignment=ft.alignment.bottom_left,
+                            padding=ft.padding.Padding(left=40,top=40,right=40,bottom=60),
+                            # padding=ft.padding.all(60),
                             # padding=ft.padding.only(20, top=40, right=10, bottom=40),
                             content=ft.Column(
                                 # alignment=ft.MainAxisAlignment.START,
@@ -491,7 +487,7 @@ class EmployeesPage:
                             ),
                             bgcolor=defaultBgColor,
                             # border=ft.border.all(1,"#808080"),
-                            padding=ft.padding.all(10),
+                            # padding=ft.padding.all(10),
                         ),
 
                     ],
@@ -505,3 +501,14 @@ class EmployeesPage:
     #     self.employee_info.controls.clear()
     #     self.page.update()
     #     self.page.go("/")
+
+    # переход на страницу обновления данных сотрудника
+    def edit_employee(self, employee_id, employee_name):
+        print(employee_id)
+        print(employee_name)
+
+        self.page.session.set("employee_id", employee_id)  # установка id для глобальной страницы
+
+        # self.page.go(f"/update_employees?employee_id={employee_id}")
+        self.page.go(f"/update_employees")
+        self.page.update()

@@ -1,41 +1,40 @@
-from datetime import datetime, date
+from datetime import datetime
 from math import ceil
 
 import flet as ft
 from flet_route import Params, Basket
 
-from crud.employees import get_all_employees_ecp_kripto
+from crud.employees import get_all_employees_ecp_kripto, get_all_employees
 from utils.style import *
 
-
 # todo def showdetailed_employee_info - метод для отображения информации о сотруднике с его лицензиями ecp и kpr
-class DashboardPage:
+class EmplAllPage:
 
     def __init__(self, page: ft.Page):
-        self.pagination_controls_dash = ft.Row()
+        self.pagination_controls = ft.Row()
         self.page = page  # основная страница приложения
 
         # Элементы интерфейса
         self.result_text = ft.Text("", color=ft.Colors.WHITE)
-        self.employee_info_dash = ft.ListView(expand=True)
+        self.employee_info_all = ft.ListView(expand=True)
         self.current_page = 1
         self.page_size = 15
         self.total_pages = 1
         self.result_text = ft.Text()
-        # self.load_employees()
+        self.load_employees()
         self.filter_menu_bar = ft.MenuBar(
             controls=[
                 ft.SubmenuButton(
-                    content=ft.Text("действующие ЭЦП и КриптоПро-CSP"),
+                    content=ft.Text("все работники"),
                     controls=[
+                        ft.MenuItemButton(
+                            content=ft.Text("действующие ЭЦП и КриптоПро-CSP"),
+                            on_click=self.go_home, # с лицензиями
+                        ),
                         # ft.MenuItemButton(
                         #     content=ft.Text("все работники"),
-                        #     on_click=self.go_all_employees  #,
+                        #     on_click=self.go_current_licenses  #
                         # ),
-                        ft.MenuItemButton(
-                            content=ft.Text("все работники"),
-                            on_click=self.go_all_employees  #
-                        ),
                         ft.MenuItemButton(
                             content=ft.Text("недействующие ЭЦП и КриптоПро-CSP"),
                             on_click=self.go_easisted_licenses  # todo реализовать
@@ -45,19 +44,21 @@ class DashboardPage:
             ]
         )
 
-    # def go_current_license(self, e):
-    #     self.page.go("/dashboard_current_licens")  # todo запуск метода со всеми сотрудниками
 
-    def go_all_employees(self, e):
-        self.page.go("/all_employees")  # todo запуск метода сотрудниками со всеми действующими лицензиям
+
+    def go_home(self, e):
+        self.page.go("/") # сотрудники с лицензиями
+
+    # def go_current_licenses(self, e):
+    #     self.page.go("/") # todo запуск метода сотрудниками со всеми действующими лицензиям
 
     def go_easisted_licenses(self, e):
-        self.page.go("/dashboard_easisted_licenses")  # todo запуск метода сотрудниками со всеми просрченными лицензиям
+        self.page.go("/dashboard_easisted_licenses") # todo запуск метода сотрудниками со всеми просрченными лицензиям
 
     def update_pagination_controls(self):
         """Обновляет элементы управления пагинацией."""
-        self.pagination_controls_dash.controls.clear()
-        self.pagination_controls_dash.controls.extend([
+        self.pagination_controls.controls.clear()
+        self.pagination_controls.controls.extend([
             ft.Button(
                 "Предыдущая",
                 color=menuFontColor,
@@ -89,6 +90,9 @@ class DashboardPage:
 
         self.page.go(f"/employees_info")
 
+
+
+
     def load_employees(self):
         # ст
         try:
@@ -97,22 +101,10 @@ class DashboardPage:
             if not employees:
                 self.result_text.value = "Нет сотрудников в базе."
                 self.result_text.color = ft.Colors.RED
-                self.employee_info_dash.controls.clear()
+                self.employee_info_all.controls.clear()
                 self.page.update()
                 return
 
-            def license_active(employee):
-                ecp_active = any(
-                    (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-                    for rec in (employee.ecp or [])
-                ) if employee.ecp else False  # Если записей нет, считаем, что ЭЦП просрочено
-
-                kripto_active = any(
-                    (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-                    for rec in (employee.kriptos or [])
-                ) if employee.kriptos else False  # Если записей нет, считаем, что КриптоПро просрочено
-
-                return ecp_active or kripto_active
 
             # Функция для получения минимальной даты окончания ЭЦП
             def get_min_ecp_date(employee):
@@ -139,59 +131,23 @@ class DashboardPage:
 
                 return min(ecp_date, kripto_date)  # Берем минимальную из двух дат
 
+
             # Сортировка сотрудников
             employees.sort(key=lambda emp_tuple: get_min_ecp_kripto_date(emp_tuple[0]))
 
-            # Отфильтруем сотрудников без активных лицензий
-            #     filtered_employees = [
-            #     emp for emp in employees
-            #     if any(
-            #         ((rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) - datetime.now().date()).days > 0
-            #         for rec in (emp[0].ecp or []) + (emp[0].kriptos or [])
-            #     )
-            # ]
-
-
-            # Фильтрация сотрудников с активными лицензиями
-            filtered_employees = [emp_tuple for emp_tuple in employees if license_active(emp_tuple[0])]
-
-            # Сортировка по ближайшей дате окончания
-            filtered_employees.sort(key=lambda emp_tuple: get_min_ecp_kripto_date(emp_tuple[0]))
-
-            # def license_active(employee):
-            #     ecp_active = any(
-            #         (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-            #         for rec in (employee.ecp or [])
-            #     ) if employee.ecp else False  # Если записей нет, считаем, что ЭЦП просрочено
-            #
-            #     kripto_active = any(
-            #         (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-            #         for rec in (employee.kriptos or [])
-            #     ) if employee.kriptos else False  # Если записей нет, считаем, что КриптоПро просрочено
-            #
-            #     return ecp_active or kripto_active  # Возвращаем True, если хотя бы одна лицензия активна
-
-            filtered_employees = [
-                emp for emp in employees
-                if any(
-                    (rec.finish_date if isinstance(rec.finish_date,
-                                                   date) else rec.finish_date.date()) >= datetime.now().date()
-                    for rec in (emp[0].ecp or []) + (emp[0].kriptos or [])
-                )
-            ]
 
             # Расчёт данных для текущей страницы
-            self.total_pages = ceil(len(filtered_employees) / self.page_size)
+            self.total_pages = ceil(len(employees) / self.page_size)
             start_index = (self.current_page - 1) * self.page_size
             end_index = start_index + self.page_size
-            page_employees = filtered_employees[start_index:end_index]
+            page_employees = employees[start_index:end_index]
 
-            self.employee_info_dash.controls.clear()
+            self.employee_info_all.controls.clear()
 
             # Заголовки таблицы
             data_table = ft.DataTable(
                 columns=[
-                    ft.DataColumn(ft.Text("cотрудник", color=ft.Colors.WHITE, size=22)),
+                    ft.DataColumn(ft.Text("сотрудник", color=ft.Colors.WHITE, size=22)),
                     ft.DataColumn(ft.Text("дата окончания эцп", color=ft.Colors.WHITE, size=22)),
                     ft.DataColumn(ft.Text("дата окончания кпр", color=ft.Colors.WHITE, size=22)),
                 ],
@@ -214,6 +170,8 @@ class DashboardPage:
                         if days_left > 0:  # Фильтрация истекших записей
                             ecp_data.append(f"{finish_date.strftime('%d.%m.%Yг.')} ({days_left} дней осталось)")
 
+                        ecp_data.append(f"{finish_date.strftime('%d.%m.%Yг.')} ({abs(days_left)} дней прошло)")
+
                 ecp_info = "\n".join(ecp_data) if ecp_data else "Нет данных"
 
                 # Сбор информации о КриптоПро
@@ -228,12 +186,13 @@ class DashboardPage:
                         days_left = (finish_date - datetime.now().date()).days
                         if days_left > 0:  # Фильтрация истекших записей
                             kripto_data.append(f"{finish_date.strftime('%d.%m.%Yг.')} ({days_left} дней осталось)")
+                        kripto_data.append(f"{finish_date.strftime('%d.%m.%Yг.')} ({abs(days_left)} дней прошло)")
 
                 kripto_info = "\n".join(kripto_data) if kripto_data else "Нет данных"
 
                 # Если у сотрудника нет активных лицензий, не добавлять его в таблицу
-                if not ecp_data and not kripto_data:
-                    continue
+                # if not ecp_data and not kripto_data:
+                #     continue
 
                 # Добавление строки с данными сотрудника
                 data_table.rows.append(
@@ -253,7 +212,7 @@ class DashboardPage:
                 )
 
             # Добавление таблицы в контейнер
-            self.employee_info_dash.controls.append(data_table)
+            self.employee_info_all.controls.append(data_table)
 
             # Обновление пагинации и страницы
             self.update_pagination_controls()
@@ -267,6 +226,8 @@ class DashboardPage:
             print(traceback.format_exc())  # Вывод трейсбэка для отладки
             self.page.update()
 
+
+
     def go_to_page(self, page_number):
         """Переход к указанной странице."""
         if 1 <= page_number <= self.total_pages:
@@ -274,17 +235,19 @@ class DashboardPage:
             self.load_employees()
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
-        page.title = "Работники с лицензиями"
+        page.title = "Все работники"
         page.window.width = defaultWithWindow
         page.window.height = defaultHeightWindow
         page.window.min_width = 1000
         page.window.min_height = 600
         page.scroll = "adaptive"
-        self.load_employees()  # обновление данных при каждом переходе на страницу
+        self.load_employees()  # Загрузка сотрудников при открытии страницы
+
 
         # Проверяем параметр обновления
         # if params.get("refresh") == "true":
         #     self.load_employees()
+
 
         style_menu = ft.ButtonStyle(color='#FBF0F0',
                                     icon_size=30,
@@ -310,7 +273,7 @@ class DashboardPage:
         )
 
         return ft.View(
-            "/",
+            "/all_employees",
             controls=[
                 ft.Row(
                     expand=True,
@@ -341,9 +304,9 @@ class DashboardPage:
                                     # self.filter_menu_bar,
                                     self.result_text,
                                     ft.Divider(),
-                                    self.employee_info_dash,
+                                    self.employee_info_all,
                                     ft.Divider(),
-                                    self.pagination_controls_dash
+                                    self.pagination_controls
                                 ]
                             ),
                             bgcolor=defaultBgColor,
