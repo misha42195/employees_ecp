@@ -8,10 +8,10 @@ class Settings(BaseSettings):
     ALGORITHM: str
     CHAT_ID: int
     API_TOKEN: str
+
     # JWT_SECRET_KEY: str
     # JWY_ALGORITHM: str
     # ACCESS_TOKEN_EXPIRE_MINUTES: int
-
 
     @property
     def DB_URL(self):
@@ -20,4 +20,4 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
 
-settings = Settings() # type: ignore
+settings = Settings()

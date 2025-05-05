@@ -7,12 +7,13 @@ from bot.notify import create_notification
 API_TOKEN = "7733544557:AAE7gTzxBrrjNgKF1XGBJzXxZN_XzN0A2fU" # тимура
 # API_TOKEN = "7293241408:AAFxMuHHYqo6u6my89vF8J7n4NplwmSM2SI" # мой
 # API_TOKEN = settings.API_TOKEN
+
 CHAT_ID = settings.CHAT_ID
 
 bot = Bot(token=API_TOKEN)
 
 # Список ID чатов, кому нужно отправить уведомления
-chat_ids = [1617521485]  # Добавьте сюда другие chat_id, если нужно
+chat_ids = [1617521485]  # мой
 
 
 # chat_ids = [590070274]

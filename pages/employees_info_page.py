@@ -25,6 +25,7 @@ from utils.style import *
 
 class EmployeesInfoPage:
     def __init__(self, page: ft.Page):
+        self.selected_mchd_id = None
         self.page = page
         self.selected_ecp_id = None
         self.selected_kpr_id = None
@@ -164,6 +165,7 @@ class EmployeesInfoPage:
             self.result_text.update()
             return {}
 
+        matched = []
         for file in os.listdir(classifier_file_path):
             full_path = os.path.join(classifier_file_path, file)
             if os.path.isfile(full_path) and file.lower().endswith(".xml"):
@@ -173,7 +175,6 @@ class EmployeesInfoPage:
                 matched = match_codes_classifier(
                     dover_codes=dower_code_list, classifier_map=classifier_mapping
                 )
-
         return matched
 
     def download_mchd_xml(self, e, mchd_id=None):
@@ -237,7 +238,7 @@ class EmployeesInfoPage:
 
     def close_dialog_mchd(self, e):
         self.page.close(self.delete_mchd_dialog)
-        self.reset_state()
+        # self.reset_state()
         self.page.go("/employees_info")
 
     def add_mchd_page(self, employee_id, employee_name):
@@ -1064,7 +1065,6 @@ class EmployeesInfoPage:
             self.page.update()
 
         self.result_text = ft.Text("")
-        self.found_employee = None
 
     def reset_state(self):
         self.employee_info_right.controls.clear()

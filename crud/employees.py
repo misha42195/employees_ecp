@@ -4,11 +4,9 @@ from sqlalchemy import select, insert, func, delete, update, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-
 from models.ecpes import EcpORM
 from models.kriptoproies import KriptosORM
 from schemas.employees import Employee, EmployeeAdd, EmployeePost
-
 
 from datetime import datetime, timedelta
 from sqlalchemy import select
@@ -21,19 +19,17 @@ current_date = datetime.today().date()
 print(f"current_date", current_date)
 
 
-
-
 def get_all_employees():
     with session_maker() as session:
         query = (
             select(EmployeesORM)
             .outerjoin(EcpORM, EmployeesORM.id == EcpORM.employees_id)
             .outerjoin(KriptosORM, EmployeesORM.id == KriptosORM.employees_id)
-                 .options(
-            joinedload(EmployeesORM.ecp),
+            .options(
+                joinedload(EmployeesORM.ecp),
                 joinedload(EmployeesORM.kriptos))
-                 .where(or_(EcpORM.finish_date >= current_date,
-                            KriptosORM.finish_date >= current_date)))
+            .where(or_(EcpORM.finish_date >= current_date,
+                       KriptosORM.finish_date >= current_date)))
 
         print(f":ЗАПРОС", query.compile(compile_kwargs={"literal_binds": True}))
         result = session.execute(query)
@@ -161,7 +157,6 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 
 
-
 def get_employees_with_expiring_licenses():
     current_date = datetime.now()
     date_limit = current_date + timedelta(days=20)
@@ -175,7 +170,6 @@ def get_employees_with_expiring_licenses():
             .where((EcpORM.finish_date <= date_limit) & (EcpORM.finish_date >= current_date))
         )
         ecps = session.execute(ecp_stmt).all()
-        print(f"ЭЦПППППППППППППППППППППП {ecps}")
 
         kriptos_stmt = (
             select(EmployeesORM, KriptosORM)
@@ -183,7 +177,6 @@ def get_employees_with_expiring_licenses():
             .where((KriptosORM.finish_date <= date_limit) & (KriptosORM.finish_date >= current_date))
         )
         kriptos = session.execute(kriptos_stmt).all()
-        print(f"ЭЦПППППППППППППППППППППП {ecps}")
 
         employee_dict = {}
 
@@ -202,7 +195,6 @@ def get_employees_with_expiring_licenses():
             result.append((employee, related_objects["ecp"], related_objects["kriptos"]))
 
         return result
-
 
 
 def get_one_employees_with_id(employee_id: int):

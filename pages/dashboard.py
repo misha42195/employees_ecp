@@ -42,7 +42,7 @@ class DashboardPage:
         )
 
     def reset_state(self):
-        self.current_page = 1
+        # self.current_page = 1
         self.total_pages = 1
         self.employee_info_dash.controls = []
         self.result_text.value = ""
