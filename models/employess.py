@@ -17,3 +17,6 @@ class EmployeesORM(Base):
 
     # Связь с таблицей KriptosORM (один ко многим)
     kriptos = relationship("KriptosORM", back_populates="employee", cascade="all, delete")
+
+
+    mchd = relationship("MchdORM", back_populates="employee",cascade="all, delete")

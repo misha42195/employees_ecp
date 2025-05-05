@@ -1,277 +1,278 @@
-from datetime import datetime, date
+import asyncio
+from datetime import datetime
 from math import ceil
-
+import threading
 import flet as ft
 from flet_route import Params, Basket
 
-from crud.employees import get_all_employees_ecp_kripto
+from crud.employees import get_all_employees_ecp_kripto_mchd
 from utils.style import *
 
 
-# todo def showdetailed_employee_info - метод для отображения информации о сотруднике с его лицензиями ecp и kpr
 class DashboardPage:
 
     def __init__(self, page: ft.Page):
         self.pagination_controls_dash = ft.Row()
-        self.page = page  # основная страница приложения
+        self.page = page
 
-        # Элементы интерфейса
         self.result_text = ft.Text("", color=ft.Colors.WHITE)
         self.employee_info_dash = ft.ListView(expand=True)
         self.current_page = 1
         self.page_size = 15
         self.total_pages = 1
-        self.result_text = ft.Text()
-        # self.load_employees()
+        self.loading_ring = ft.ProgressRing(
+            width=40, height=40, stroke_width=3, color=ft.Colors.AMBER, visible=False
+        )
+
         self.filter_menu_bar = ft.MenuBar(
             controls=[
                 ft.SubmenuButton(
-                    content=ft.Text("действующие ЭЦП и КриптоПро-CSP"),
+                    content=ft.Text("действующие ЭЦП, КриптоПро-CSP,  МЧД"),
                     controls=[
-                        # ft.MenuItemButton(
-                        #     content=ft.Text("все работники"),
-                        #     on_click=self.go_all_employees  #,
-                        # ),
                         ft.MenuItemButton(
-                            content=ft.Text("все работники"),
-                            on_click=self.go_all_employees  #
+                            content=ft.Text("все работники"), on_click=self.go_all  #
                         ),
                         ft.MenuItemButton(
-                            content=ft.Text("недействующие ЭЦП и КриптоПро-CSP"),
-                            on_click=self.go_easisted_licenses  # todo реализовать
+                            content=ft.Text("недействующие ЭЦП, КриптоПро-CSP, МЧД"),
+                            on_click=self.go_easisted_licenses,
                         ),
                     ],
                 )
             ]
         )
 
-    # def go_current_license(self, e):
-    #     self.page.go("/dashboard_current_licens")  # todo запуск метода со всеми сотрудниками
+    def reset_state(self):
+        self.current_page = 1
+        self.total_pages = 1
+        self.employee_info_dash.controls = []
+        self.result_text.value = ""
+        self.pagination_controls_dash.controls.clear()
 
-    def go_all_employees(self, e):
-        self.page.go("/all_employees")  # todo запуск метода сотрудниками со всеми действующими лицензиям
+    def download_mchd(self):
+        self.reset_state()
+        self.page.go("/all_employees")
+
+    def go_all(self, e):
+        self.reset_state()
+        self.page.go("/all_employees")
 
     def go_easisted_licenses(self, e):
-        self.page.go("/dashboard_easisted_licenses")  # todo запуск метода сотрудниками со всеми просрченными лицензиям
+        self.reset_state()
+        self.page.go("/dashboard_easisted_licenses")
 
     def update_pagination_controls(self):
-        """Обновляет элементы управления пагинацией."""
         self.pagination_controls_dash.controls.clear()
-        self.pagination_controls_dash.controls.extend([
-            ft.Button(
-                "Предыдущая",
-                color=menuFontColor,
-                on_click=lambda e: self.go_to_page(self.current_page - 1),
-                disabled=self.current_page <= 1  # Отключаем кнопку на первой странице
-            ),
-            ft.Text(f"Страница {self.current_page} из {self.total_pages}", color=ft.Colors.WHITE),
-            ft.ElevatedButton(
-                "Следующая",
-                color=menuFontColor,
-                on_click=lambda e: self.go_to_page(self.current_page + 1),
-                disabled=self.current_page >= self.total_pages  # Отключаем кнопку на последней странице
-            )
-        ])
-
-    # переход на страницу обновления данных сотрудника
-    def edit_employee(self, employee_id, employee_name):
-        print(employee_id)
-        print(employee_name)
-
-        self.page.session.set("employee_id", employee_id)  # установка id для глобальной страницы
-
-        # self.page.go(f"/update_employees?employee_id={employee_id}")
-        self.page.go(f"/update_employees")
-        self.page.update()
+        self.pagination_controls_dash.controls.extend(
+            [
+                ft.Button(
+                    "Предыдущая",
+                    color=menuFontColor,
+                    on_click=lambda e: self.go_to_page(self.current_page - 1),
+                    disabled=self.current_page <= 1,
+                ),
+                ft.Text(
+                    f"Страница {self.current_page} из {self.total_pages}",
+                    color=ft.Colors.WHITE,
+                ),
+                ft.ElevatedButton(
+                    "Следующая",
+                    color=menuFontColor,
+                    on_click=lambda e: self.go_to_page(self.current_page + 1),
+                    disabled=self.current_page >= self.total_pages,
+                ),
+            ]
+        )
 
     def show_employee_info(self, empl_id: int):
+        self.page.session.set("empl_id", None)
         self.page.session.set("empl_id", empl_id)
-
         self.page.go(f"/employees_info")
 
     def load_employees(self):
-        # ст
+        self.employee_info_dash.controls = []
         try:
-            employees = get_all_employees_ecp_kripto()
-            # employees = get_all_employees()
+            employees = get_all_employees_ecp_kripto_mchd()
             if not employees:
                 self.result_text.value = "Нет сотрудников в базе."
                 self.result_text.color = ft.Colors.RED
-                self.employee_info_dash.controls.clear()
                 self.page.update()
                 return
 
-            def license_active(employee):
-                ecp_active = any(
-                    (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-                    for rec in (employee.ecp or [])
-                ) if employee.ecp else False  # Если записей нет, считаем, что ЭЦП просрочено
+            def has_active_license(employee):
+                today = datetime.now().date()
 
-                kripto_active = any(
-                    (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-                    for rec in (employee.kriptos or [])
-                ) if employee.kriptos else False  # Если записей нет, считаем, что КриптоПро просрочено
+                def is_active(record):
+                    return record.finish_date >= today
 
-                return ecp_active or kripto_active
+                return (
+                    any(is_active(ecp) for ecp in (employee.ecp or []))
+                    or any(is_active(kripto) for kripto in (employee.kriptos or []))
+                    or any(is_active(mchd) for mchd in (employee.mchd or []))
+                )
 
-            # Функция для получения минимальной даты окончания ЭЦП
             def get_min_ecp_date(employee):
-                dates = [
-                    ecp_record.finish_date.date() if isinstance(ecp_record.finish_date,
-                                                                datetime) else ecp_record.finish_date
-                    for ecp_record in (employee.ecp or [])  # Если нет записей, используем пустой список
-                ]
-                return min(dates, default=datetime.max.date())  # Если нет дат, возвращаем максимальную дату
+                dates = [ecp_record.finish_date for ecp_record in (employee.ecp or [])]
+                return min(dates, default=datetime.max.date())
 
-            # Функция для получения минимальной даты окончания КриптоПро
             def get_min_kripto_date(employee):
                 dates = [
-                    kripto_record.finish_date.date() if isinstance(kripto_record.finish_date,
-                                                                   datetime) else kripto_record.finish_date
+                    kripto_record.finish_date
                     for kripto_record in (employee.kriptos or [])
                 ]
-                return min(dates, default=datetime.max.date())  # Если нет дат, возвращаем максимальную дату
+                return min(dates, default=datetime.max.date())
 
-            # Функция для получения минимальной даты из ЭЦП и КриптоПро
+            def get_min_mchd_date(employee):
+                dates = [
+                    mchd_record.finish_date for mchd_record in (employee.mchd or [])
+                ]
+                return min(dates, default=datetime.max.date())
+
             def get_min_ecp_kripto_date(employee):
                 ecp_date = get_min_ecp_date(employee)
                 kripto_date = get_min_kripto_date(employee)
+                mchd_date = get_min_mchd_date(employee)
 
-                return min(ecp_date, kripto_date)  # Берем минимальную из двух дат
+                return min(ecp_date, kripto_date, mchd_date)
 
-            # Сортировка сотрудников
-            employees.sort(key=lambda emp_tuple: get_min_ecp_kripto_date(emp_tuple[0]))
-
-            # Отфильтруем сотрудников без активных лицензий
-            #     filtered_employees = [
-            #     emp for emp in employees
-            #     if any(
-            #         ((rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) - datetime.now().date()).days > 0
-            #         for rec in (emp[0].ecp or []) + (emp[0].kriptos or [])
-            #     )
-            # ]
-
-
-            # Фильтрация сотрудников с активными лицензиями
-            filtered_employees = [emp_tuple for emp_tuple in employees if license_active(emp_tuple[0])]
-
-            # Сортировка по ближайшей дате окончания
-            filtered_employees.sort(key=lambda emp_tuple: get_min_ecp_kripto_date(emp_tuple[0]))
-
-            # def license_active(employee):
-            #     ecp_active = any(
-            #         (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-            #         for rec in (employee.ecp or [])
-            #     ) if employee.ecp else False  # Если записей нет, считаем, что ЭЦП просрочено
-            #
-            #     kripto_active = any(
-            #         (rec.finish_date if isinstance(rec.finish_date, date) else rec.finish_date.date()) >= datetime.now().date()
-            #         for rec in (employee.kriptos or [])
-            #     ) if employee.kriptos else False  # Если записей нет, считаем, что КриптоПро просрочено
-            #
-            #     return ecp_active or kripto_active  # Возвращаем True, если хотя бы одна лицензия активна
-
-            filtered_employees = [
-                emp for emp in employees
-                if any(
-                    (rec.finish_date if isinstance(rec.finish_date,
-                                                   date) else rec.finish_date.date()) >= datetime.now().date()
-                    for rec in (emp[0].ecp or []) + (emp[0].kriptos or [])
-                )
+            employees_with_licenses = [
+                emp_tuple for emp_tuple in employees if has_active_license(emp_tuple[0])
             ]
 
-            # Расчёт данных для текущей страницы
-            self.total_pages = ceil(len(filtered_employees) / self.page_size)
+            employees_with_licenses.sort(
+                key=lambda emp_tuple: get_min_ecp_kripto_date(emp_tuple[0])
+            )
+
+            employees = employees_with_licenses
+
+            self.total_pages = ceil(len(employees) / self.page_size)
             start_index = (self.current_page - 1) * self.page_size
             end_index = start_index + self.page_size
-            page_employees = filtered_employees[start_index:end_index]
+            page_employees = employees[start_index:end_index]
 
-            self.employee_info_dash.controls.clear()
-
-            # Заголовки таблицы
             data_table = ft.DataTable(
                 columns=[
-                    ft.DataColumn(ft.Text("cотрудник", color=ft.Colors.WHITE, size=22)),
-                    ft.DataColumn(ft.Text("дата окончания эцп", color=ft.Colors.WHITE, size=22)),
-                    ft.DataColumn(ft.Text("дата окончания кпр", color=ft.Colors.WHITE, size=22)),
+                    ft.DataColumn(ft.Text()),
+                    ft.DataColumn(ft.Text("Сотрудник", color=ft.Colors.BLUE, size=22)),
+                    ft.DataColumn(ft.Text("ЭЦП", color=ft.Colors.BLUE, size=22)),
+                    ft.DataColumn(
+                        ft.Text("КриптоПро-Csp", color=ft.Colors.BLUE, size=22)
+                    ),
+                    ft.DataColumn(ft.Text("МЧД", color=ft.Colors.BLUE, size=22)),
                 ],
                 rows=[],
             )
 
-            for employee_tuple in page_employees:
+            for num, employee_tuple in enumerate(page_employees, start=start_index + 1):
                 employee = employee_tuple[0]
 
-                # Сбор информации об ЭЦП
                 ecp_data = []
                 if employee.ecp:
                     for ecp_record in employee.ecp:
-                        finish_date = (
-                            ecp_record.finish_date.date()
-                            if isinstance(ecp_record.finish_date, datetime)
-                            else ecp_record.finish_date
-                        )
+                        finish_date = ecp_record.finish_date
                         days_left = (finish_date - datetime.now().date()).days
-                        if days_left > 0:  # Фильтрация истекших записей
-                            ecp_data.append(f"{finish_date.strftime('%d.%m.%Yг.')} ({days_left} дней осталось)")
+                        if days_left >= 0:  # Фильтрация истекших записей
+                            ecp_data.append(
+                                f"{finish_date.strftime('%d.%m.%Yг.')}  ({days_left})"
+                            )
 
-                ecp_info = "\n".join(ecp_data) if ecp_data else "Нет данных"
+                ecp_info = "\n".join(ecp_data) if ecp_data else ""
 
-                # Сбор информации о КриптоПро
                 kripto_data = []
                 if employee.kriptos:
                     for kripto_record in employee.kriptos:
-                        finish_date = (
-                            kripto_record.finish_date.date()
-                            if isinstance(kripto_record.finish_date, datetime)
-                            else kripto_record.finish_date
-                        )
+                        finish_date = kripto_record.finish_date
                         days_left = (finish_date - datetime.now().date()).days
-                        if days_left > 0:  # Фильтрация истекших записей
-                            kripto_data.append(f"{finish_date.strftime('%d.%m.%Yг.')} ({days_left} дней осталось)")
+                        if days_left >= 0:  # Фильтрация истекших записей
+                            kripto_data.append(
+                                f"{finish_date.strftime('%d.%m.%Yг.')} ({days_left})"
+                            )
 
-                kripto_info = "\n".join(kripto_data) if kripto_data else "Нет данных"
+                kripto_info = "\n".join(kripto_data) if kripto_data else ""
 
-                # Если у сотрудника нет активных лицензий, не добавлять его в таблицу
-                if not ecp_data and not kripto_data:
-                    continue
+                mchd_data = []
+                if employee.mchd:
+                    for mchd_record in employee.mchd:
+                        finish_date = mchd_record.finish_date
+                        days_left = (finish_date - datetime.now().date()).days
+                        if days_left >= 0:  # Фильтрация истекших записей
+                            mchd_data.append(
+                                f"{finish_date.strftime('%d.%m.%Yг.')} ({days_left})"
+                            )
 
-                # Добавление строки с данными сотрудника
+                mchd_info = "\n".join(mchd_data) if mchd_data else ""
+
                 data_table.rows.append(
                     ft.DataRow(
                         cells=[
-                            ft.DataCell(ft.Text(employee.full_name, color=ft.Colors.WHITE, size=18)),
-                            ft.DataCell(ft.Text(ecp_info,
-                                                color=ft.Colors.GREEN if "дней осталось" in ecp_info else ft.Colors.RED,
-                                                size=18)),
-                            ft.DataCell(ft.Text(kripto_info,
-                                                color=ft.Colors.GREEN if "дней осталось" in kripto_info else ft.Colors.RED,
-                                                size=18)),
+                            ft.DataCell(
+                                ft.Text(value=str(num), size=18, color=ft.Colors.BLUE)
+                            ),
+                            ft.DataCell(
+                                ft.Text(
+                                    employee.full_name, color=ft.Colors.BLUE, size=18
+                                )
+                            ),
+                            ft.DataCell(
+                                ft.Text(ecp_info, color=ft.Colors.WHITE, size=18)
+                            ),
+                            ft.DataCell(
+                                ft.Text(kripto_info, color=ft.Colors.WHITE, size=18)
+                            ),
+                            ft.DataCell(
+                                ft.Text(mchd_info, color=ft.Colors.WHITE, size=18)
+                            ),
                         ],
-                        # Обработчик нажатия
-                        on_long_press=lambda e, emp_id=employee.id: self.show_employee_info(emp_id),
+                        on_long_press=lambda e, emp_id=employee.id: self.on_employee_press(
+                            emp_id
+                        ),
                     )
                 )
 
-            # Добавление таблицы в контейнер
-            self.employee_info_dash.controls.append(data_table)
+            self.employee_info_dash.controls = [data_table]
 
-            # Обновление пагинации и страницы
             self.update_pagination_controls()
             self.page.update()
 
-
         except Exception as ex:
-            import traceback
             self.result_text.value = f"Ошибка при загрузке данных: {str(ex)}"
             self.result_text.color = ft.Colors.RED
-            print(traceback.format_exc())  # Вывод трейсбэка для отладки
             self.page.update()
 
+    def _run_show_employee_info(self, emp_id):
+        asyncio.run(self.load_and_show_employee(emp_id))
+
+    def on_employee_press(self, emp_id):
+        self.loading_ring.visible = True
+        self.page.update()
+
+        threading.Thread(
+            target=self._run_show_employee_info, args=(emp_id,), daemon=True
+        ).start()
+
+    async def load_and_show_employee(self, emp_id):
+        self.show_employee_info(emp_id)
+        await asyncio.sleep(6)
+        self.loading_ring.visible = False
+        self.page.update()
+
     def go_to_page(self, page_number):
-        """Переход к указанной странице."""
         if 1 <= page_number <= self.total_pages:
             self.current_page = page_number
-            self.load_employees()
+
+        self.reset_state()
+        self.load_employees()
+
+    def finde_employ(self):
+        self.reset_state()
+        self.page.go("/employees")
+
+    def add_mcd_classif(self):
+        self.reset_state()
+        self.page.go("/add_mcd_classif")  # todo переход на добавления файла
+
+    def add_employees(self):
+        self.reset_state()
+        self.page.go("/add_employees")
 
     def view(self, page: ft.Page, params: Params, basket: Basket):
         page.title = "Работники с лицензиями"
@@ -280,33 +281,41 @@ class DashboardPage:
         page.window.min_width = 1000
         page.window.min_height = 600
         page.scroll = "adaptive"
-        self.load_employees()  # обновление данных при каждом переходе на страницу
+        self.load_employees()
 
-        # Проверяем параметр обновления
-        # if params.get("refresh") == "true":
-        #     self.load_employees()
+        style_menu = ft.ButtonStyle(
+            color="#FBF0F0",
+            icon_size=30,
+            text_style=ft.TextStyle(size=16),
+            overlay_color=defaultBgColor,
+            shadow_color=defaultBgColor,
+        )
 
-        style_menu = ft.ButtonStyle(color='#FBF0F0',
-                                    icon_size=30,
-                                    text_style=ft.TextStyle(size=16),
-                                    overlay_color=defaultBgColor,
-                                    shadow_color=defaultBgColor,
-                                    )
-
-        # Панель сайдбар
         sidebar_menu = ft.Container(
-
             padding=ft.padding.symmetric(0, 13),
             content=ft.Column(
                 controls=[
                     ft.Text("МЕНЮ", color=menuFontColor, size=18),
-                    ft.TextButton("Поиск сотрудника", icon=ft.Icons.SEARCH, style=style_menu,
-                                  on_click=lambda e: self.page.go("/employees")),
-                    ft.TextButton("Добавить сотрудника", icon=ft.Icons.ADD, style=style_menu,
-                                  on_click=lambda e: self.page.go("/add_employees")),
-
+                    ft.TextButton(
+                        "Поиск сотрудника",
+                        icon=ft.Icons.SEARCH,
+                        style=style_menu,
+                        on_click=lambda e: self.finde_employ(),
+                    ),
+                    ft.TextButton(
+                        "Добавить сотрудника",
+                        icon=ft.Icons.ADD,
+                        style=style_menu,
+                        on_click=lambda e: self.add_employees(),
+                    ),
+                    ft.TextButton(
+                        "Загрузить мчд справочник",
+                        icon=ft.Icons.DOWNLOAD,
+                        style=style_menu,
+                        on_click=lambda e: self.add_mcd_classif(),
+                    ),
                 ]
-            )
+            ),
         )
 
         return ft.View(
@@ -316,41 +325,33 @@ class DashboardPage:
                     expand=True,
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        # Левая сторона
                         ft.Container(
                             expand=2,
-                            content=ft.Column(
-                                controls=[
-                                    sidebar_menu
-                                ]
-                            ),
+                            content=ft.Column(controls=[sidebar_menu]),
                             bgcolor=secondaryBgColor,
-                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
-                            padding=ft.padding.all(10),  # Внутренние отступы
+                            padding=ft.padding.all(10),
                         ),
-                        # Контейнер с данными сотрудников
                         ft.Container(
-                            expand=4,
+                            expand=7,
                             content=ft.Column(
                                 controls=[
                                     ft.Row(
                                         controls=[
-                                            self.filter_menu_bar
+                                            self.filter_menu_bar,
+                                            self.loading_ring,
                                         ]
                                     ),
-                                    # self.filter_menu_bar,
                                     self.result_text,
                                     ft.Divider(),
                                     self.employee_info_dash,
                                     ft.Divider(),
-                                    self.pagination_controls_dash
+                                    self.pagination_controls_dash,
                                 ]
                             ),
                             bgcolor=defaultBgColor,
-                            # border=ft.border.all(1, "#808080"),  # Рамка с серым цветом
-                            padding=ft.padding.all(10),  # Внутренние отступы
-                        )
-                    ]
+                            padding=ft.padding.all(10),
+                        ),
+                    ],
                 )
             ],
             bgcolor=defaultBgColor,

@@ -120,7 +120,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/flutter/windows/flutter/ephemeral/.plugin_symlinks/window_to_front/linux/flutter/ephemeral/.plugin_symlinks/window_to_front/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/build/flutter/windows/flutter/ephemeral/.plugin_symlinks/window_to_front/linux/flutter/ephemeral/.plugin_symlinks/window_to_front/build" />
     </content>
-    <orderEntry type="jdk" jdkName="Poetry (Employee_ECP)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.11 virtualenv at ~/.cache/pypoetry/virtualenvs/employee-ecp-cPenbGKH-py3.11" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
